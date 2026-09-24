@@ -13,11 +13,7 @@
         "name": "Fulltech"
       },
       "category": "utilities",
-      "source": {
-        "type": "github",
-        "repo": "fulltechapp/fulltech-platform-skills",
-        "path": "plugins/android-sanitizer"
-      }
+      "source": "./plugins/android-sanitizer"
     },
     {
       "name": "ios-sanitizer",
@@ -26,11 +22,7 @@
         "name": "Fulltech"
       },
       "category": "utilities",
-      "source": {
-        "type": "github",
-        "repo": "fulltechapp/fulltech-platform-skills",
-        "path": "plugins/ios-sanitizer"
-      }
+      "source": "./plugins/ios-sanitizer"
     },
     {
       "name": "windows-sanitizer",
@@ -39,11 +31,7 @@
         "name": "Fulltech"
       },
       "category": "utilities",
-      "source": {
-        "type": "github",
-        "repo": "fulltechapp/fulltech-platform-skills",
-        "path": "plugins/windows-sanitizer"
-      }
+      "source": "./plugins/windows-sanitizer"
     }
   ]
 }
