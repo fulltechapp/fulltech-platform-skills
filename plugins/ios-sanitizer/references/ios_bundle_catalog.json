@@ -1,0 +1,38 @@
+{
+  "predatory_subscription_cleaners": [
+    {
+      "name": "Smart Cleaner - Clean Storage",
+      "bundle_id": "com.bpmmobile.smartcleaner",
+      "risk": "Aggressive weekly trial subscription trap",
+      "action": "PROMPT_UNINSTALL"
+    },
+    {
+      "name": "Cleaner Kit: Clean up Storage",
+      "bundle_id": "com.appslav.cleaner",
+      "risk": "Deceptive memory booster promises",
+      "action": "PROMPT_UNINSTALL"
+    },
+    {
+      "name": "Phone Cleaner - Clean Storage",
+      "bundle_id": "com.cleaner.storage.cleanup",
+      "risk": "Subscription scam with intrusive popups",
+      "action": "PROMPT_UNINSTALL"
+    }
+  ],
+  "ad_networks_blocked_by_sinkhole": [
+    "UnityAds (*.unityads.unity3d.com)",
+    "Google AdMob (*.pagead2.googlesyndication.com, *.admob.com)",
+    "AppLovin (*.applovin.com)",
+    "IronSource (*.supersonicads.com)",
+    "Vungle (*.vungle.com)",
+    "Mintegral (*.mintegral.com)",
+    "InMobi (*.inmobi.com)",
+    "Chartboost (*.chartboost.com)"
+  ],
+  "malicious_profile_indicators": [
+    "com.apple.proxy.http",
+    "com.apple.vpn.managed",
+    "com.apple.security.root",
+    "mdm.enrollment"
+  ]
+}

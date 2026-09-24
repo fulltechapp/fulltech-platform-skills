@@ -85,6 +85,7 @@ Register this marketplace repository in Claude Code:
 Install the desired plugin:
 ```bash
 /plugin install android-sanitizer
+/plugin install ios-sanitizer
 ```
 
 ### 2. In Google Antigravity / Agentic Environments
@@ -92,11 +93,13 @@ Clone or copy the skill directory into your user or project agents directory:
 ```bash
 # Global user level (available across all workspaces)
 cp -r plugins/android-sanitizer ~/.agents/skills/
+cp -r plugins/ios-sanitizer ~/.agents/skills/
 ```
 
 ### 3. Via Open Skills CLI (`skills.sh`)
 ```bash
 npx skills add fulltechapp/fulltech-platform-skills@android-sanitizer
+npx skills add fulltechapp/fulltech-platform-skills@ios-sanitizer
 ```
 
 ---
@@ -110,15 +113,27 @@ fulltech-platform-skills/
 ├── .claude-plugin/
 │   └── marketplace.json            # Claude Code / Claude Hub catalog index
 ├── plugins/
-│   └── android-sanitizer/          # Autonomous Android triage & forensics
+│   ├── android-sanitizer/          # Autonomous Android triage & forensics
+│   │   ├── .claude-plugin/
+│   │   │   └── plugin.json         # Claude plugin descriptor
+│   │   ├── SKILL.md                # Universal multi-harness agent instructions
+│   │   ├── scripts/
+│   │   │   ├── triage.sh           # POSIX bash helper (--health, --sod, --watch)
+│   │   │   └── triage.ps1          # Windows PowerShell helper (-HealthCheck, -AuditSOD)
+│   │   └── references/
+│   │       └── oem_catalog.json    # Vendor ad engines & bloatware database
+│   └── ios-sanitizer/              # Autonomous iOS triage & performance forensics
 │       ├── .claude-plugin/
 │       │   └── plugin.json         # Claude plugin descriptor
 │       ├── SKILL.md                # Universal multi-harness agent instructions
 │       ├── scripts/
-│       │   ├── triage.sh           # POSIX bash helper (--health, --sod, --watch)
-│       │   └── triage.ps1          # Windows PowerShell helper (-HealthCheck, -AuditSOD)
+│       │   ├── triage.ps1          # Autonomous PowerShell triage runner
+│       │   ├── triage_helper.py    # Async BMS hardware & lockdown extractor
+│       │   └── serve_profile.py    # Local profile server for 1-click DoH setup
+│       ├── profiles/
+│       │   └── adguard_dns.mobileconfig # Native Apple DoH encrypted DNS payload
 │       └── references/
-│           └── oem_catalog.json    # Vendor ad engines & bloatware database
+│           └── ios_bundle_catalog.json # Known predatory cleaner apps & ad networks
 ├── README.md                       # English documentation
 ├── README.pt-BR.md                 # Brazilian Portuguese documentation
 └── README.es.md                    # Spanish documentation

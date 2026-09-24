@@ -1,0 +1,12 @@
+{
+  "name": "ios-sanitizer",
+  "version": "1.0.0",
+  "description": "Autonomous iOS device triage, adware remediation, battery wear inspection (cycle count & raw capacity via BMS), malicious configuration profile audit, and encrypted DNS ad-sinkhole setup via Apple Lockdown protocol.",
+  "author": {
+    "name": "Fulltech"
+  },
+  "category": "utilities",
+  "skills": [
+    "./SKILL.md"
+  ]
+}

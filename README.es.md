@@ -85,6 +85,7 @@ Registra este repositorio como marketplace en Claude Code:
 Instala la habilidad deseada:
 ```bash
 /plugin install android-sanitizer
+/plugin install ios-sanitizer
 ```
 
 ### 2. En Google Antigravity / Entornos con Agent Skills
@@ -92,11 +93,13 @@ Copia o crea un enlace simbólico de la carpeta de la habilidad en el directorio
 ```bash
 # Nivel global de usuario (disponible en todos los workspaces)
 cp -r plugins/android-sanitizer ~/.agents/skills/
+cp -r plugins/ios-sanitizer ~/.agents/skills/
 ```
 
 ### 3. Vía CLI Abierto de Skills (`skills.sh`)
 ```bash
 npx skills add fulltechapp/fulltech-platform-skills@android-sanitizer
+npx skills add fulltechapp/fulltech-platform-skills@ios-sanitizer
 ```
 
 ---
@@ -110,15 +113,27 @@ fulltech-platform-skills/
 ├── .claude-plugin/
 │   └── marketplace.json            # Catálogo indexador de Claude Code / Claude Hub
 ├── plugins/
-│   └── android-sanitizer/          # Habilidad de triaje forense y limpieza Android
+│   ├── android-sanitizer/          # Habilidad de triaje forense y limpieza Android
+│   │   ├── .claude-plugin/
+│   │   │   └── plugin.json         # Manifiesto de plugin para Claude
+│   │   ├── SKILL.md                # Instrucciones universales para agentes
+│   │   ├── scripts/
+│   │   │   ├── triage.sh           # Utilidad POSIX bash (--health, --sod, --watch)
+│   │   │   └── triage.ps1          # Utilidad Windows PowerShell (-HealthCheck, -AuditSOD)
+│   │   └── references/
+│   │       └── oem_catalog.json    # Catálogo de motores de anuncios y bloatware por fabricante
+│   └── ios-sanitizer/              # Habilidad de triaje forense y rendimiento iOS
 │       ├── .claude-plugin/
 │       │   └── plugin.json         # Manifiesto de plugin para Claude
 │       ├── SKILL.md                # Instrucciones universales para agentes
 │       ├── scripts/
-│       │   ├── triage.sh           # Utilidad POSIX bash (--health, --sod, --watch)
-│       │   └── triage.ps1          # Utilidad Windows PowerShell (-HealthCheck, -AuditSOD)
+│       │   ├── triage.ps1          # Utilidad autónoma PowerShell
+│       │   ├── triage_helper.py    # Motor asíncrono para BMS, batería y lockdown
+│       │   └── serve_profile.py    # Servidor local para instalación de perfil DoH
+│       ├── profiles/
+│       │   └── adguard_dns.mobileconfig # Perfil nativo Apple DoH para bloqueo de anuncios
 │       └── references/
-│           └── oem_catalog.json    # Catálogo de motores de anuncios y bloatware por fabricante
+│           └── ios_bundle_catalog.json # Catálogo de apps y redes publicitarias abusivas
 ├── README.md                       # Documentación en Inglés
 ├── README.pt-BR.md                 # Documentación en Portugués de Brasil
 └── README.es.md                    # Documentación en Español
