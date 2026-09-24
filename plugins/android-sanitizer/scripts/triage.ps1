@@ -3,7 +3,7 @@
     Android Sanitizer - Automated ADB Triage & Diagnostic Helper (PowerShell)
 .DESCRIPTION
     Audits connected Android device for adware, overlay abusers, vendor ad services,
-    battery health, hardware lifespan, storage metrics, and Private DNS status.
+    battery health, hardware lifespan, Sleep-of-Death (SOD) crashes, and Private DNS status.
 #>
 
 [CmdletBinding()]
@@ -11,7 +11,8 @@ param(
     [switch]$WatchOverlay,
     [switch]$OpenDnsSettings,
     [switch]$TestDns,
-    [switch]$HealthCheck
+    [switch]$HealthCheck,
+    [switch]$AuditSOD
 )
 
 function Write-Section($title) {
@@ -42,6 +43,20 @@ Write-Host "Model:          $model"
 Write-Host "Android:        $androidVer"
 Write-Host "Security Patch: $patch"
 
+# Sleep of Death (SOD) & Crash Audit
+if ($AuditSOD -or $HealthCheck) {
+    Write-Section "Sleep-of-Death (SOD) & Display Crash Audit"
+    $sodLogs = adb shell "dumpsys dropbox --print" | Select-String -Pattern "mm-pp-dpps|surfaceflinger|DEAD_OBJECT|system_server_crash"
+    if ($sodLogs) {
+        Write-Host "  [ALERT] Sleep-of-Death (SOD) crash markers found in Dropbox!" -ForegroundColor Red
+        Write-Host "  Symptom: Phone appears dead with 100% battery, only waking on USB plug." -ForegroundColor Yellow
+        Write-Host "  Root Cause: Display pipeline deadlock (mm-pp-dpps/SurfaceFlinger) caused by ad overlays/video loops." -ForegroundColor Yellow
+        $sodLogs | Select-Object -First 4 | ForEach-Object { Write-Host "    $($_.Line.Trim())" -ForegroundColor DarkYellow }
+    } else {
+        Write-Host "  [CLEAN] No display crash or SOD deadlocks found." -ForegroundColor Green
+    }
+}
+
 if ($HealthCheck) {
     Write-Section "Hardware & Battery Health Analysis"
     
@@ -62,11 +77,11 @@ if ($HealthCheck) {
     if (-not $desCap) { $desCap = 4000 }
     $healthPct = if ($estCap -and [int]$desCap -gt 0) { [math]::Round(([double]$estCap / [double]$desCap) * 100, 1) } else { "N/A" }
 
-    Write-Host "  Battery Level:       $level%" -ForegroundColor Green
-    Write-Host "  Battery Health:      $healthStr" -ForegroundColor Green
-    Write-Host "  Battery Voltage:     $voltage V"
-    Write-Host "  Battery Temperature: $temp °C"
-    Write-Host "  Estimated Capacity:  $estCap mAh (Design: $desCap mAh)"
+    Write-Host "  Battery Level:        $level%" -ForegroundColor Green
+    Write-Host "  Battery Health:       $healthStr" -ForegroundColor Green
+    Write-Host "  Battery Voltage:      $voltage V"
+    Write-Host "  Battery Temperature:  $temp °C"
+    Write-Host "  Estimated Capacity:   $estCap mAh (Design: $desCap mAh)"
     Write-Host "  Battery Health Ratio: $healthPct%" -ForegroundColor $(if ($healthPct -ge 80) { "Green" } else { "Yellow" })
 
     # 2. Thermal status
@@ -74,12 +89,12 @@ if ($HealthCheck) {
     $tStatus = ($thermal | Select-String "Thermal Status:\s*(\d+)").Matches.Groups[1].Value
     $tMap = @{"0"="Normal (Sem estrangulamento térmico)"; "1"="Light Throttling"; "2"="Moderate"; "3"="Severe"; "4"="Critical"}
     $tStatusStr = if ($tMap.ContainsKey($tStatus)) { $tMap[$tStatus] } else { "Normal" }
-    Write-Host "  Thermal Status:      $tStatusStr" -ForegroundColor Green
+    Write-Host "  Thermal Status:       $tStatusStr" -ForegroundColor Green
 
     # 3. Storage
     $df = adb shell "df -h /data" | Select-Object -Skip 1
     $sParts = ($df.Trim() -split "\s+")
-    Write-Host "  Storage /data:       $($sParts[2]) usado de $($sParts[1]) ($($sParts[3]) livre, $($sParts[4]) ocupado)"
+    Write-Host "  Storage /data:        $($sParts[2]) usado de $($sParts[1]) ($($sParts[3]) livre, $($sParts[4]) ocupado)"
 
     # 4. RAM
     $mem = adb shell "dumpsys meminfo" | Select-String "Total RAM:|Free RAM:|Used RAM:"

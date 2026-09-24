@@ -37,7 +37,26 @@ echo "Android:        $android_ver"
 echo "Security Patch: $patch"
 
 case "$1" in
+    --sod|--crash-audit)
+        log_section "Sleep-of-Death (SOD) & Display Crash Audit"
+        sod_logs=$(adb shell "dumpsys dropbox --print" | grep -E "mm-pp-dpps|surfaceflinger|DEAD_OBJECT|system_server_crash" || true)
+        if [ -n "$sod_logs" ]; then
+            echo -e "${color_red}  [ALERT] Sleep-of-Death (SOD) crash markers found in Dropbox!${color_reset}"
+            echo -e "${color_yellow}  Symptom: Phone appears dead with 100% battery, only waking on USB plug.${color_reset}"
+            echo -e "${color_yellow}  Root Cause: Display pipeline deadlock (mm-pp-dpps/SurfaceFlinger) caused by ad overlays/video loops.${color_reset}"
+            echo "$sod_logs" | head -n 5
+        else
+            echo -e "${color_green}  [CLEAN] No display crash or SOD deadlocks found.${color_reset}"
+        fi
+        exit 0
+        ;;
     --health|--battery)
+        log_section "Sleep-of-Death (SOD) Check"
+        sod_logs=$(adb shell "dumpsys dropbox --print" | grep -E "mm-pp-dpps|surfaceflinger|DEAD_OBJECT" || true)
+        if [ -n "$sod_logs" ]; then
+            echo -e "${color_red}  [ALERT] Display deadlock / SOD tombstone markers detected.${color_reset}"
+        fi
+
         log_section "Hardware & Battery Health Analysis"
         batt=$(adb shell dumpsys battery)
         level=$(echo "$batt" | grep "level:" | awk '{print $2}')

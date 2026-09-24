@@ -10,13 +10,14 @@ Comprehensive agent skill to audit, diagnose, clean, and protect Android devices
 ## Key Capabilities
 
 1. **Elderly Care & Casual User Protection**: Keeps harmless casual games (Mahjong, Candy Crush, Solitaire) and banking/medical apps intact while silencing their ads via Private DNS sinkhole.
-2. **Cascade Ad-Loop Detection & Interactive Questionnaire**: Identifies "domino effect" installations (ad chains where users accidentally install 4-8 apps in a tight cluster, marked by launcher blue dots) and prompts the user via an interactive questionnaire.
-3. **Aggressive Performance Debloat**: Deep-cleans older devices, stripping duplicate video apps, preloaded bloat, analytics, and OEM telemetry to free RAM and CPU.
-4. **Hardware & Battery Health Diagnostics**: Audits battery capacity (learned vs. design mAh), wear percentage, thermal throttling status, and RAM/storage utilization.
-5. **Real-Time Forensic Catching**: Detects which package is popping up on screen right at the moment an ad appears (`mCurrentFocus` / `mFocusedApp`).
-6. **Permission & Overlay Auditing**: Identifies apps abusing `SYSTEM_ALERT_WINDOW` (drawing over other apps) and Accessibility Services.
-7. **OEM Bloatware Catalog**: Curated database for Xiaomi (HyperOS/MIUI), Samsung (One UI), Motorola, and Transsion (Infinix/Tecno).
-8. **Private DNS Sinkhole Guidance**: Automates opening the native Android Private DNS screen to configure AdGuard (`dns.adguard-dns.com`), stopping in-app ads at the network level.
+2. **Sleep-of-Death (SOD) Forensic Engine**: Diagnoses and resolves the critical failure mode where devices with 100% battery freeze into an un-wakeable black screen, waking only upon USB connection (caused by Qualcomm Display Post-Processing `mm-pp-dpps` deadlocks triggered by lockscreen adware collisions).
+3. **Cascade Ad-Loop Detection & Interactive Questionnaire**: Identifies "domino effect" installations (ad chains where users accidentally install 4-8 apps in a tight cluster, marked by launcher blue dots) and prompts the user via an interactive questionnaire.
+4. **Aggressive Performance Debloat**: Deep-cleans older devices, stripping duplicate video apps, preloaded bloat, analytics, and OEM telemetry to free RAM and CPU.
+5. **Hardware & Battery Health Diagnostics**: Audits battery capacity (learned vs. design mAh), wear percentage, thermal throttling status, and RAM/storage utilization.
+6. **Real-Time Forensic Catching**: Detects which package is popping up on screen right at the moment an ad appears (`mCurrentFocus` / `mFocusedApp`).
+7. **Permission & Overlay Auditing**: Identifies apps abusing `SYSTEM_ALERT_WINDOW` (drawing over other apps) and Accessibility Services.
+8. **OEM Bloatware Catalog**: Curated database for Xiaomi (HyperOS/MIUI), Samsung (One UI), Motorola, and Transsion (Infinix/Tecno).
+9. **Private DNS Sinkhole Guidance**: Automates opening the native Android Private DNS screen to configure AdGuard (`dns.adguard-dns.com`), stopping in-app ads at the network level.
 
 ---
 
@@ -73,6 +74,15 @@ Users often get trapped in a domino ad installation loop where multiple apps are
 # Cluster installs by timestamp
 adb shell dumpsys package | grep -E "Package \[|firstInstallTime"
 ```
+
+#### F. Sleep-of-Death (SOD) & Display Pipeline Audit
+If the user reports that the device "appears dead / black screen with 100% battery" and only wakes up when a USB charging cable is plugged in, inspect system tombstones for Qualcomm Display Post-Processing (`mm-pp-dpps`) and SurfaceFlinger deadlocks:
+```bash
+# Search for display deadlock and crash markers
+adb shell "dumpsys dropbox --print" | grep -E "mm-pp-dpps|surfaceflinger|DEAD_OBJECT|SYSTEM_TOMBSTONE"
+```
+*Root Cause:* Simultaneous collision between hardware-accelerated video ad buffers (`SurfaceView`) and lockscreen overlay pushers (e.g., Xiaomi Wallpaper Carousel `fashiongallery`, Peel Remote plugin `peel.plugin`). The display driver crashes (`DEAD_OBJECT`), preventing the Power button from waking the panel. Connecting USB delivers a hardware VBUS PMIC interrupt that restarts the display pipeline.
+*Remediation:* Purge all lockscreen ad pushers, video ad cascade apps, and OEM ad engines.
 
 ---
 

@@ -8,26 +8,70 @@
 </p>
 
 <p align="center">
-  <img src="https://img.shields.io/badge/Architecture-Multi--Harness-blue?style=flat-square" alt="Multi-Harness" />
-  <img src="https://img.shields.io/badge/Claude%20Code-Compatible-8A2BE2?style=flat-square" alt="Claude Code" />
-  <img src="https://img.shields.io/badge/Google%20Antigravity-Compatible-4285F4?style=flat-square" alt="Google Antigravity" />
-  <img src="https://img.shields.io/badge/skills.sh-Ecosystem-green?style=flat-square" alt="Skills.sh" />
-  <img src="https://img.shields.io/badge/License-MIT-lightgrey?style=flat-square" alt="License" />
+  <img src="https://img.shields.io/badge/Architecture-Multi--Harness-blue?style=for-the-badge&logo=anthropic" alt="Multi-Harness" />
+  <img src="https://img.shields.io/badge/Claude%20Code-Compatible-8A2BE2?style=for-the-badge" alt="Claude Code" />
+  <img src="https://img.shields.io/badge/Google%20Antigravity-Compatible-4285F4?style=for-the-badge&logo=google" alt="Google Antigravity" />
+  <img src="https://img.shields.io/badge/skills.sh-Ecosystem-green?style=for-the-badge" alt="Skills.sh" />
+  <img src="https://img.shields.io/badge/License-MIT-lightgrey?style=for-the-badge" alt="License" />
 </p>
 
 ---
 
-> **Enterprise-grade Multi-Harness Agent Skills, DevOps & Engineering Marketplace for Fulltech.**
+> **Autonomous Multi-Harness Agent Skills, DevOps Engineering & Device Forensics Marketplace for Fulltech.**
 
-This repository hosts production-ready, modular skills designed to work seamlessly across modern AI coding agents and harnesses, including **Claude Code**, **Google Antigravity**, **Cursor**, **OpenAI Codex**, and **Orca**.
+This repository hosts production-ready, modular skills designed to run seamlessly across modern agentic coding harnesses: **Claude Code**, **Google Antigravity**, **Cursor**, **OpenAI Codex**, and **Orca**.
 
 ---
 
-## 📦 Skills Directory
+## 🌟 Spotlight Skill: `android-sanitizer`
+
+> *"Why did Grandma's phone with 100% battery look completely dead until plugged into USB?"*
+
+Most Android debloaters are static lists of package names. **`android-sanitizer`** is an **autonomous forensic triage agent** that connects via ADB, investigates system tombstones in real-time, diagnoses hardware-level driver crashes, and rehabilitates devices.
+
+### 🔬 Real-World Case Study: The "Sleep of Death" (SOD) Adware Deadlock
+
+During testing on a Snapdragon 660 device (Redmi Note 7), the phone exhibited classic **Sleep of Death (SOD)**:
+- Battery was at **100% (4.39 V)**, yet the Power button could not wake the screen.
+- Plugging in a USB cable generated a 5V PMIC interrupt that forced the display awake.
+
+`android-sanitizer` queried low-level system tombstones (`dumpsys dropbox`) and unmasked the culprit:
+
+```text
+Timestamp: 2026-09-06 21:38:38-0300
+Process: >>> /system/vendor/bin/mm-pp-dpps <<<
+Signal: 6 (SIGABRT)
+Abort message: 'Attempted to retrieve value from failed HIDL call: Status(EX_TRANSACTION_FAILED): DEAD_OBJECT'
+```
+
+**The Forensic Chain:**
+1. At `21:03` to `21:35`, a cascade loop of free games with aggressive video interstitials was installed.
+2. At `21:38`, when the screen turned off, hardware-accelerated video buffers (`SurfaceView`) collided with Xiaomi's Wallpaper Carousel (`fashiongallery`) attempting to project lockscreen ads.
+3. Qualcomm's Display Post-Processing service (`mm-pp-dpps`) crashed into a `DEAD_OBJECT` deadlock.
+4. **Remediation:** Purging the lockscreen pushers and video ad loop permanently solved the SOD, while freeing **~300 MB of RAM** and measuring a **98% battery health retention (3,923 mAh / 4,000 mAh)**!
+
+---
+
+## 📊 Comparison: Static Debloaters vs. `android-sanitizer`
+
+| Capability | Traditional Debloaters (UAD, Canta) | `android-sanitizer` (Agent Skill) |
+| :--- | :---: | :---: |
+| **Conversational Triage** | ❌ No | ✅ **Autonomous AI Agent** |
+| **Sleep-of-Death (SOD) Detection** | ❌ No | ✅ **Inspects tombstones & `mm-pp-dpps`** |
+| **Cascade Loop ("Blue Dot") Audit** | ❌ No | ✅ **Clusters same-day ad install chains** |
+| **Interactive User Questionnaire** | ❌ No | ✅ **Guided choices via `ask_question`** |
+| **Elderly Care (Protect Games & Banks)**| ❌ Risk of breaking | ✅ **Preserves games, neuters ads** |
+| **Hardware & Battery Wear Analysis** | ❌ No | ✅ **Learned mAh vs. Design capacity** |
+| **Private DNS Ad-Sinkhole Automation**| ❌ Manual | ✅ **Automated Intent launcher** |
+| **Multi-Harness Architecture** | ❌ Standalone GUI only | ✅ **Claude Code, Antigravity, Codex, Cursor** |
+
+---
+
+## 📦 Directory of Skills
 
 | Skill | Category | Description | Supported Harnesses |
 | :--- | :--- | :--- | :--- |
-| [`android-sanitizer`](./plugins/android-sanitizer/) | Utilities / Mobile | Autonomous Android triage, adware remediation, OEM bloatware removal (Xiaomi, Samsung, Motorola, Transsion), and Private DNS ad-sinkhole automation. | Claude Code, Antigravity, Cursor, Codex, Orca |
+| [`android-sanitizer`](./plugins/android-sanitizer/) | Mobile Forensics / Optimization | Autonomous Android triage, adware remediation, SOD diagnosis, OEM bloatware removal (Xiaomi, Samsung, Motorola, Transsion), and Private DNS ad-sinkhole automation. | Claude Code, Antigravity, Cursor, Codex, Orca |
 
 ---
 
@@ -66,13 +110,13 @@ fulltech-platform-skills/
 ├── .claude-plugin/
 │   └── marketplace.json            # Claude Code / Claude Hub catalog index
 ├── plugins/
-│   └── android-sanitizer/          # Autonomous Android triage skill
+│   └── android-sanitizer/          # Autonomous Android triage & forensics
 │       ├── .claude-plugin/
 │       │   └── plugin.json         # Claude plugin descriptor
 │       ├── SKILL.md                # Universal multi-harness agent instructions
 │       ├── scripts/
-│       │   ├── triage.sh           # POSIX bash helper
-│       │   └── triage.ps1          # Windows PowerShell helper
+│       │   ├── triage.sh           # POSIX bash helper (--health, --sod, --watch)
+│       │   └── triage.ps1          # Windows PowerShell helper (-HealthCheck, -AuditSOD)
 │       └── references/
 │           └── oem_catalog.json    # Vendor ad engines & bloatware database
 ├── README.md                       # English documentation
