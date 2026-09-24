@@ -36,7 +36,7 @@ Este repositório hospeda skills modulares e prontas para produção, projetadas
 ### 1. No Claude Code (via Marketplace)
 Registre este repositório como marketplace no Claude Code:
 ```bash
-/plugin marketplace add diogofrj/fulltech-platform-skills
+/plugin marketplace add fulltechapp/fulltech-platform-skills
 ```
 Instale a skill desejada:
 ```bash
@@ -52,7 +52,7 @@ cp -r plugins/android-sanitizer ~/.agents/skills/
 
 ### 3. Pelo CLI Aberto de Skills (`skills.sh`)
 ```bash
-npx skills add diogofrj/fulltech-platform-skills@android-sanitizer
+npx skills add fulltechapp/fulltech-platform-skills@android-sanitizer
 ```
 
 ---
