@@ -141,12 +141,29 @@ if (Test-Path $lxss) {
 if ($wslDistros.Count -eq 0) {
     Write-Host "[-] Nenhuma distro WSL2 encontrada." -ForegroundColor DarkGray
 } elseif (Should-Run "Deseja compactar os discos do WSL2? (executa wsl --shutdown e fecha todas as distros)" $CompactWslDisks) {
+    foreach ($d in $wslDistros) {
+        $vhdx = Join-Path $d.BasePath "ext4.vhdx"
+        $vhdx = $vhdx -replace '^\\\\\?\\', ''
+        if (-not (Test-Path -LiteralPath $vhdx)) { continue }
+        $item = Get-Item -LiteralPath $vhdx
+        $isSparse = [bool]($item.Attributes -band [System.IO.FileAttributes]::SparseFile)
+        if ($isSparse) {
+            Write-Host "[*] $($d.DistributionName): VHDX configurado como esparso (SparseFile). Executando fstrim interno..." -ForegroundColor Cyan
+            wsl.exe -d $d.DistributionName -u root bash -c "fstrim -v /" 2>$null | Out-Null
+        }
+    }
     wsl.exe --shutdown
     foreach ($d in $wslDistros) {
         $vhdx = Join-Path $d.BasePath "ext4.vhdx"
         $vhdx = $vhdx -replace '^\\\\\?\\', ''
         if (-not (Test-Path -LiteralPath $vhdx)) { continue }
-        $before = [math]::Round((Get-Item -LiteralPath $vhdx).Length / 1GB, 2)
+        $item = Get-Item -LiteralPath $vhdx
+        $isSparse = [bool]($item.Attributes -band [System.IO.FileAttributes]::SparseFile)
+        $before = [math]::Round($item.Length / 1GB, 2)
+        if ($isSparse) {
+            Write-Host "[+] $($d.DistributionName): VHDX esparso otimizado via TRIM (tamanho alocado gerenciado dinamicamente: $before GB)." -ForegroundColor Green
+            continue
+        }
         try {
             if (Get-Command Optimize-VHD -ErrorAction SilentlyContinue) {
                 Optimize-VHD -Path $vhdx -Mode Full -ErrorAction Stop
