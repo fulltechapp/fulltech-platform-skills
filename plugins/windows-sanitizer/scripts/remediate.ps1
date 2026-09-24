@@ -25,10 +25,20 @@ if (-not (Test-Path $TriagePath)) {
     }
 }
 
+# Flatten comma-delimited ExcludeApps passed via CLI
+$normalizedExclude = @()
+foreach ($item in $ExcludeApps) {
+    if ($item -match ',') {
+        $normalizedExclude += ($item -split ',').Trim()
+    } elseif ($item) {
+        $normalizedExclude += $item.Trim()
+    }
+}
+
 $hasExplicitFlags = $DisableTelemetry -or $RemoveBloatware -or $ApplyHostsSinkhole
 
 function Should-Run {
-    param([string]$ActionName, [switch]$FlagValue)
+    param([string]$ActionName, [bool]$FlagValue = $false)
     if ($FlagValue) { return $true }
     if ($hasExplicitFlags) { return $false }
     if ($AutoConfirm) { return $true }
@@ -66,7 +76,7 @@ if (Test-Path $TriagePath) {
         Write-Host "Encontrados $($bloatware.Count) aplicativos de bloatware." -ForegroundColor Gray
         if (Should-Run "Deseja remover os aplicativos de bloatware detectados?" $RemoveBloatware) {
             foreach ($app in $bloatware) {
-                if ($ExcludeApps -contains $app) {
+                if ($normalizedExclude -contains $app) {
                     Write-Host "[*] Mantendo aplicativo excluido pelo usuario: $app" -ForegroundColor Cyan
                     continue
                 }
@@ -84,7 +94,7 @@ if (Test-Path $TriagePath) {
     Write-Host "Arquivo de triage nao encontrado ($TriagePath). Execute triage.ps1 primeiro." -ForegroundColor Red
 }
 
-# 3. Ad-Sinkhole Local (Hosts)
+# 3. Ad-Sinkhole Local (Arquivo Hosts)
 Write-Host "`n[3] Ad-Sinkhole Local (Arquivo Hosts)" -ForegroundColor Yellow
 if (Should-Run "Deseja adicionar regras de bloqueio de anuncios e rastreamento no arquivo Hosts?" $ApplyHostsSinkhole) {
     $hostsPath = "$env:windir\System32\drivers\etc\hosts"
@@ -99,15 +109,23 @@ if (Should-Run "Deseja adicionar regras de bloqueio de anuncios e rastreamento n
         "0.0.0.0 sqm.telemetry.microsoft.com.nsatc.net"
     )
     
-    $currentHosts = Get-Content $hostsPath -Raw
-    $added = 0
-    foreach ($entry in $sinkholeEntries) {
-        if ($currentHosts -notmatch [regex]::Escape($entry)) {
-            Add-Content -Path $hostsPath -Value $entry
-            $added++
+    try {
+        $currentHosts = Get-Content $hostsPath -Raw -ErrorAction Stop
+        $linesToAdd = @()
+        foreach ($entry in $sinkholeEntries) {
+            if ($currentHosts -notmatch [regex]::Escape($entry)) {
+                $linesToAdd += $entry
+            }
         }
+        if ($linesToAdd.Count -gt 0) {
+            [System.IO.File]::AppendAllText($hostsPath, "`r`n" + ($linesToAdd -join "`r`n") + "`r`n")
+            Write-Host "[+] $($linesToAdd.Count) entradas de sinkhole adicionadas ao hosts." -ForegroundColor Green
+        } else {
+            Write-Host "[*] Todas as entradas de sinkhole ja estavam presentes no hosts." -ForegroundColor Cyan
+        }
+    } catch {
+        Write-Host "[!] Nao foi possivel editar o arquivo hosts: $($_.Exception.Message)" -ForegroundColor Red
     }
-    Write-Host "[+] $added entradas de sinkhole adicionadas ao hosts." -ForegroundColor Green
 } else {
     Write-Host "[-] Insercao no hosts ignorada." -ForegroundColor DarkGray
 }

@@ -1,0 +1,23 @@
+﻿{
+    "Performance":  {
+                        "StartupAppCount":  13
+                    },
+    "Disk":  {
+                 "FreeGB":  166.4,
+                 "TotalGB":  464.78,
+                 "FreePercentage":  35.8
+             },
+    "Security":  {
+                     "TelemetryEnabled":  false,
+                     "BloatwareCount":  0,
+                     "DetectedBloatware":  [
+
+                                           ]
+                 },
+    "System":  {
+                   "BuildNumber":  "26100",
+                   "OSVersion":  "Microsoft Windows 11 Pro for Workstations",
+                   "RAM":  "64 GB",
+                   "CPU":  "Intel(R) Core(TM) i5-8400 CPU @ 2.80GHz"
+               }
+}
