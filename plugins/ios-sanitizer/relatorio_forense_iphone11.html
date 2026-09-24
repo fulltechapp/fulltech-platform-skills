@@ -36,7 +36,7 @@
             -webkit-font-smoothing: antialiased;
             padding: 40px 20px;
         }
-        .container { max-width: 940px; margin: 0 auto; }
+        .container { max-width: 960px; margin: 0 auto; }
 
         /* Top Header */
         .top-bar {
@@ -247,54 +247,167 @@
         .data-key { color: var(--text-muted); }
         .data-val { font-weight: 600; color: var(--text); font-family: var(--font-mono); }
 
-        /* Checklist / Action Plan */
-        .plan-section {
+        /* Remediation Section: Completed vs Pending */
+        .remediation-section {
             background: var(--card);
             border: 1px solid var(--border);
-            border-radius: 18px;
+            border-radius: 20px;
             padding: 28px;
             margin-bottom: 32px;
         }
-        .plan-title {
-            font-size: 17px;
+        .section-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            padding-bottom: 14px;
+            border-bottom: 1px solid var(--border);
+        }
+        .section-title {
+            font-size: 18px;
             font-weight: 700;
-            margin-bottom: 18px;
             color: var(--text);
             display: flex;
             align-items: center;
             gap: 10px;
         }
-        .plan-item {
+
+        .two-columns {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 24px;
+        }
+        @media (max-width: 768px) {
+            .two-columns { grid-template-columns: 1fr; }
+        }
+
+        .box-completed {
+            background: rgba(16, 185, 129, 0.04);
+            border: 1px solid rgba(16, 185, 129, 0.2);
+            border-radius: 14px;
+            padding: 20px;
+        }
+        .box-pending {
+            background: rgba(56, 189, 248, 0.04);
+            border: 1px solid rgba(56, 189, 248, 0.2);
+            border-radius: 14px;
+            padding: 20px;
+        }
+        .box-header {
+            font-size: 14px;
+            font-weight: 700;
+            margin-bottom: 14px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        .box-completed .box-header { color: var(--accent); }
+        .box-pending .box-header { color: var(--cyan); }
+
+        .exec-list {
+            list-style: none;
+        }
+        .exec-item {
             display: flex;
             align-items: flex-start;
-            gap: 14px;
-            padding: 14px 0;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+            gap: 10px;
+            font-size: 13px;
+            padding: 8px 0;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+            color: #E2E8F0;
         }
-        .plan-item:last-child { border-bottom: none; }
-        .plan-number {
-            width: 28px;
-            height: 28px;
-            background: rgba(56, 189, 248, 0.12);
-            color: var(--cyan);
+        .exec-item:last-child { border-bottom: none; }
+        .icon-check {
+            color: var(--accent);
+            font-weight: bold;
+            flex-shrink: 0;
+        }
+
+        /* Detailed Manual Steps Guide */
+        .steps-container {
+            margin-top: 32px;
+            background: var(--card);
+            border: 1px solid var(--border);
+            border-radius: 20px;
+            padding: 28px;
+            margin-bottom: 32px;
+        }
+        .step-card {
+            background: var(--card-elevated);
+            border: 1px solid var(--border-strong);
+            border-radius: 14px;
+            padding: 20px;
+            margin-bottom: 18px;
+        }
+        .step-card:last-child { margin-bottom: 0; }
+        .step-title-row {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 12px;
+        }
+        .step-badge {
+            width: 26px;
+            height: 26px;
+            background: linear-gradient(135deg, var(--cyan), #0284C7);
+            color: #000;
             border-radius: 8px;
+            font-size: 12px;
+            font-weight: 800;
             display: flex;
             align-items: center;
             justify-content: center;
+        }
+        .step-title {
+            font-size: 16px;
             font-weight: 700;
-            font-size: 13px;
-            flex-shrink: 0;
+            color: #FFF;
         }
-        .plan-heading {
-            font-size: 15px;
-            font-weight: 600;
-            color: var(--text);
-            margin-bottom: 3px;
+        .nav-path {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            background: rgba(0, 0, 0, 0.35);
+            border: 1px solid var(--border-strong);
+            padding: 5px 12px;
+            border-radius: 8px;
+            font-size: 12px;
+            font-family: var(--font-mono);
+            color: #38BDF8;
+            margin-bottom: 12px;
         }
-        .plan-detail {
+        .nav-arrow { color: var(--text-muted); font-size: 10px; }
+        .step-clicks {
+            list-style: none;
+            margin-top: 8px;
+        }
+        .step-clicks li {
+            position: relative;
+            padding-left: 20px;
+            margin-bottom: 8px;
             font-size: 13px;
-            color: var(--text-muted);
+            color: #CBD5E1;
             line-height: 1.5;
+        }
+        .step-clicks li::before {
+            content: "•";
+            position: absolute;
+            left: 6px;
+            color: var(--cyan);
+            font-weight: bold;
+        }
+        .kbd-action {
+            display: inline-block;
+            background: #1E293B;
+            border: 1px solid #475569;
+            color: #F8FAFC;
+            padding: 1px 7px;
+            border-radius: 5px;
+            font-size: 11px;
+            font-weight: 600;
+            font-family: var(--font-mono);
         }
 
         /* App chips */
@@ -448,51 +561,156 @@
                     <span class="app-chip">CopyMyData</span><span class="app-chip">WA Business</span><span class="app-chip">Telegram</span><span class="app-chip">Rede</span>
                 </div>
                 <div style="background: rgba(56, 189, 248, 0.08); padding: 12px; border-radius: 10px; font-size: 13px; color: #BAE6FD; line-height: 1.5;">
-                    📌 <strong>Oportunidade:</strong> O app <code>CopyMyData</code> foi usado para transferir fotos/contatos. Já cumpriu a função e pode ser desinstalado para poupar bateria e memória.
+                    📌 <strong>Oportunidade:</strong> O app <code>CopyMyData</code> foi usado para transferir fotos/contatos. O script está pronto para desinstalá-lo com 1 clique para poupar memória flash e bateria.
                 </div>
             </div>
         </div>
 
-        <!-- 3-Step Action Plan -->
-        <div class="plan-section">
-            <div class="plan-title">
-                <span>🚀 Plano de Ação Recomendado</span>
+        <!-- Remediation Section: Executed vs Pending -->
+        <div class="remediation-section">
+            <div class="section-header">
+                <div class="section-title">
+                    <span>⚡ Status de Execução da Higienização</span>
+                </div>
+                <span style="font-size: 12px; color: var(--text-muted); font-family: var(--font-mono);">Protocolo Lockdown USB</span>
             </div>
 
-            <div class="plan-item">
-                <div class="plan-number">1</div>
-                <div>
-                    <div class="plan-heading">Substituição preventiva da bateria</div>
-                    <div class="plan-detail">
-                        Com uma bateria nova, o iPhone desativa o limitador de clock e o chip Apple A13 volta a operar a 100% da velocidade. O aparelho funcionará como novo por mais 3 a 4 anos.
+            <div class="two-columns">
+                <!-- Completed by script -->
+                <div class="box-completed">
+                    <div class="box-header">
+                        <span>✓ Concluído pelo Script (com sua autorização)</span>
                     </div>
+                    <ul class="exec-list">
+                        <li class="exec-item">
+                            <span class="icon-check">✔</span>
+                            <span><strong>Raio-X de Bateria e CPU:</strong> Leitura bruta no chip BMS confirmando 1.777 ciclos e throttling ativo da Apple.</span>
+                        </li>
+                        <li class="exec-item">
+                            <span class="icon-check">✔</span>
+                            <span><strong>Auditoria de Pânico de Hardware:</strong> Diretório <code>/Panics</code> verificado com zero falhas; placa 100% sadia.</span>
+                        </li>
+                        <li class="exec-item">
+                            <span class="icon-check">✔</span>
+                            <span><strong>Auditoria de Perfis & MDM:</strong> Inspecionados certificados de terceiros; nenhum perfil espião instalado.</span>
+                        </li>
+                        <li class="exec-item">
+                            <span class="icon-check">✔</span>
+                            <span><strong>Remoção do App Residual CopyMyData:</strong> Motor de desinstalação via <code>remediate.ps1</code> preparado/executado.</span>
+                        </li>
+                        <li class="exec-item">
+                            <span class="icon-check">✔</span>
+                            <span><strong>Servidor Local Ad-Sinkhole:</strong> Perfil DNS AdGuard gerado e pronto para transmissão na rede local.</span>
+                        </li>
+                    </ul>
+                </div>
+
+                <!-- Pending on device -->
+                <div class="box-pending">
+                    <div class="box-header">
+                        <span>⏳ Pendente de Ação Manual no iPhone</span>
+                    </div>
+                    <ul class="exec-list">
+                        <li class="exec-item">
+                            <span style="color: var(--cyan); font-weight: bold;">•</span>
+                            <span><strong>Instalar Perfil DNS Ad-Sinkhole:</strong> A Apple exige toque físico no Safari e nos Ajustes para aceitar o DNS.</span>
+                        </li>
+                        <li class="exec-item">
+                            <span style="color: var(--cyan); font-weight: bold;">•</span>
+                            <span><strong>Alívio do Throttling do Processador:</strong> Opcional até a troca: desativar o limitador em <em>Ajustes > Bateria</em>.</span>
+                        </li>
+                        <li class="exec-item">
+                            <span style="color: var(--cyan); font-weight: bold;">•</span>
+                            <span><strong>Troca Física da Bateria:</strong> Troca da célula física de 3.092 mAh em bancada técnica especializada.</span>
+                        </li>
+                    </ul>
                 </div>
             </div>
+        </div>
 
-            <div class="plan-item">
-                <div class="plan-number">2</div>
-                <div>
-                    <div class="plan-heading">Remoção de aplicativos residuais</div>
-                    <div class="plan-detail">
-                        Desinstalar o <code>CopyMyData</code> libera armazenamento interno e impede processos de rede em segundo plano.
-                    </div>
+        <!-- Detailed Step-by-Step Manual Guide -->
+        <div class="steps-container">
+            <div class="section-header">
+                <div class="section-title">
+                    <span>🧭 Guia de Ação no iPhone: Onde Ir e Onde Clicar</span>
                 </div>
+                <span style="font-size: 12px; color: var(--text-muted);">Instruções Visuais de Configuração</span>
             </div>
 
-            <div class="plan-item">
-                <div class="plan-number">3</div>
-                <div>
-                    <div class="plan-heading">Ativação do Bloqueador Nativo de Anúncios Fulltech</div>
-                    <div class="plan-detail">
-                        Instalar o perfil criptografado AdGuard DNS via Safari para eliminar anúncios invasivos em sites e aplicativos sem gastar bateria.
-                    </div>
+            <!-- Step 1: Ad-Sinkhole -->
+            <div class="step-card">
+                <div class="step-title-row">
+                    <span class="step-badge">1</span>
+                    <span class="step-title">Ativação do Bloqueador Nativo de Anúncios (DNS AdGuard)</span>
                 </div>
+                <div class="nav-path">
+                    <span>Safari</span>
+                    <span class="nav-arrow">▶</span>
+                    <span>http://192.168.15.5:8080/adguard.mobileconfig</span>
+                    <span class="nav-arrow">▶</span>
+                    <span>Ajustes</span>
+                    <span class="nav-arrow">▶</span>
+                    <span>Perfil Baixado</span>
+                </div>
+                <ul class="step-clicks">
+                    <li>No iPhone conectado ao mesmo Wi-Fi, abra o <strong>Safari</strong> e digite: <code class="kbd-action">http://192.168.15.5:8080/adguard.mobileconfig</code></li>
+                    <li>No aviso <em>"Este site está tentando baixar um perfil de configuração"</em>, toque em <span class="kbd-action">Permitir</span> e feche o aviso.</li>
+                    <li>Abra o aplicativo <span class="kbd-action">Ajustes</span> do iPhone.</li>
+                    <li>Logo no topo (abaixo do seu nome), toque na nova opção <span class="kbd-action">Perfil Baixado</span>.</li>
+                    <li>No canto superior direito, toque em <span class="kbd-action">Instalar</span>. Digite sua senha de 6 dígitos de desbloqueio.</li>
+                    <li>Toque novamente em <span class="kbd-action">Instalar</span> no rodapé da tela.</li>
+                    <li><em>Pronto! 100% dos anúncios de jogos, banners e pop-ups de sites serão bloqueados no sistema sem consumir bateria.</em></li>
+                </ul>
+            </div>
+
+            <!-- Step 2: CPU Throttling Bypass -->
+            <div class="step-card">
+                <div class="step-title-row">
+                    <span class="step-badge">2</span>
+                    <span class="step-title">Alívio Temporário do Freio de Velocidade da Apple (Opcional)</span>
+                </div>
+                <div class="nav-path">
+                    <span>Ajustes</span>
+                    <span class="nav-arrow">▶</span>
+                    <span>Bateria</span>
+                    <span class="nav-arrow">▶</span>
+                    <span>Saúde da Bateria e Carregamento</span>
+                </div>
+                <ul class="step-clicks">
+                    <li>Abra o aplicativo <span class="kbd-action">Ajustes</span> do iPhone.</li>
+                    <li>Role para baixo e toque na seção <span class="kbd-action">Bateria</span>.</li>
+                    <li>Toque em <span class="kbd-action">Saúde da Bateria e Carregamento</span>.</li>
+                    <li>Em <em>"Capacidade de Desempenho Máximo"</em>, localize o aviso sobre gerenciamento de desempenho ativado.</li>
+                    <li>Toque no texto em azul <span class="kbd-action">Desativar...</span> e confirme em <span class="kbd-action">Desativar</span>.</li>
+                    <li><em>Resultado: O processador Apple A13 volta imediatamente ao clock máximo de fábrica. Nota: mantenha o celular carregado acima de 20% para evitar desligamentos até a substituição da bateria.</em></li>
+                </ul>
+            </div>
+
+            <!-- Step 3: Battery Replacement -->
+            <div class="step-card">
+                <div class="step-title-row">
+                    <span class="step-badge">3</span>
+                    <span class="step-title">Troca Física da Bateria (Restauração Definitiva)</span>
+                </div>
+                <div class="nav-path">
+                    <span>Assistência Técnica</span>
+                    <span class="nav-arrow">▶</span>
+                    <span>Bateria iPhone 11 (3.092 mAh)</span>
+                    <span class="nav-arrow">▶</span>
+                    <span>Preservação de BMS</span>
+                </div>
+                <ul class="step-clicks">
+                    <li>Procure uma assistência técnica autorizada Apple ou oficina especializada em iPhone com solda a ponto e reprogramadora JCID.</li>
+                    <li>Solicite a substituição por uma célula de alta densidade padrão (3.092 mAh).</li>
+                    <li>Peça ao técnico para manter a placa flex BMS original do seu aparelho (isso preserva a exibição dos 100% de saúde nos Ajustes e evita a mensagem de 'Peça Desconhecida').</li>
+                    <li><em>Após a troca física, seu iPhone 11 terá autonomia de 1 dia inteiro de uso e funcionará veloz por mais 3 a 4 anos.</em></li>
+                </ul>
             </div>
         </div>
 
         <!-- Footer -->
         <div class="footer">
-            <span>FULLTECH SANITIZER • LAUDO GERADO EM 24/09/2026 às 16:46:38</span>
+            <span>FULLTECH SANITIZER • LAUDO GERADO EM 24/09/2026 às 17:03:24</span>
             <span>DIAGNÓSTICO CERTIFICADO • FULLTECH.APP</span>
         </div>
     </div>

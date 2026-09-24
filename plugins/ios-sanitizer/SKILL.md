@@ -87,37 +87,30 @@ If suspicious profiles are present:
 
 ---
 
-### Step 4: App Inventory & Crash Forensics
+### Step 4: App Inventory, Crash Forensics & Autonomous Remediation
 
-List third-party applications to identify residual migration tools or predatory cleaners:
+To audit and safely remediate detected issues with interactive confirmation:
 
 ```powershell
-& "C:\Users\dio\AppData\Local\Programs\Python\Python312\python.exe" "C:\Users\dio\.agents\skills\ios-sanitizer\scripts\triage_helper.py" "apps"
+powershell -ExecutionPolicy Bypass -File "C:\Users\dio\.agents\skills\ios-sanitizer\scripts\remediate.ps1"
 ```
 
-To remove residual apps (e.g., `CopyMyData` after a completed phone migration):
-```powershell
-& "C:\Users\dio\AppData\Local\Programs\Python\Python312\python.exe" -m pymobiledevice3 apps uninstall "com.mediamushroom.copymydata2"
-```
-
-Audit kernel crashes and memory pressure:
-```powershell
-& "C:\Users\dio\AppData\Local\Programs\Python\Python312\python.exe" "C:\Users\dio\.agents\skills\ios-sanitizer\scripts\triage_helper.py" "crashes"
-```
-
-- **Empty `/Panics`**: Confirms CPU, RAM, NAND, and Baseband are 100% physically stable.
-- **JetsamEvent**: Indicates memory exhaustion events.
+What the remediation engine does:
+1. **Interactive App Uninstallation**: Prompts for confirmation to uninstall residual migration apps (e.g., `CopyMyData` / `com.mediamushroom.copymydata2`) via `InstallationProxyService`.
+2. **Crash Log Storage Flush**: Clears stale diagnostic and crash logs from the flash NAND via `CrashReportsManager`.
+3. **Profile Purge**: Removes rogue configuration profiles if found.
+4. **Ad-Sinkhole Server**: Activates the local HTTP service to serve `adguard.mobileconfig`.
 
 ---
 
-### Step 5: Deploy Encrypted DNS Ad-Sinkhole
+### Step 5: Manual Steps on Device (Onde Ir e Onde Clicar)
 
-To eliminate video and banner ads across apps and Safari without installing third-party VPN apps:
+Due to iOS security boundaries, the following actions require physical user interaction:
+1. **DNS Ad-Sinkhole Activation**:
+   - Safari -> `http://<LAN_IP>:8080/adguard.mobileconfig` -> **Permitir**
+   - **Ajustes** -> **Perfil Baixado** -> **Instalar** (topo direito) -> Senha -> **Instalar** (rodapé).
+2. **CPU Throttling Temporary Relief (Optional)**:
+   - **Ajustes** -> **Bateria** -> **Saúde da Bateria e Carregamento** -> Toque em **Desativar...** no gerenciamento de desempenho.
+3. **Physical Battery Replacement**:
+   - Authorized Apple service or micro-soldering bench to replace the 3,092 mAh cell with BMS flex preservation.
 
-1. Launch the local profile server:
-```powershell
-& "C:\Users\dio\AppData\Local\Programs\Python\Python312\python.exe" "C:\Users\dio\.agents\skills\ios-sanitizer\scripts\serve_profile.py"
-```
-2. On the iPhone, open **Safari** and visit the printed LAN IP (`http://<LAN_IP>:8080/adguard.mobileconfig`).
-3. Tap **Permitir** (Allow).
-4. On iPhone, navigate to **Ajustes > Perfil Baixado > Instalar** and enter passcode.
