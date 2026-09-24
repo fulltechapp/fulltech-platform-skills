@@ -163,4 +163,34 @@ try {
 
 Write-Host "`n==========================================================" -ForegroundColor Cyan
 Write-Host " Higienizacao concluida com sucesso!" -ForegroundColor Green
+
+# 9. Automated HTML Forensic Report Generation
+$reportScript = Join-Path $scriptDir "generate_report.py"
+if (Test-Path $reportScript) {
+    $reportFileName = "relatorio_forense_{0}_{1}.html" -f $d.ProductType, $d.SerialNumber
+    $reportOutput = Join-Path (Split-Path -Parent $scriptDir) $reportFileName
+    
+    # Export full JSON snapshot
+    $allData = & $PythonPath $helperScript "all" 2>&1 | Out-String
+    $tempJson = Join-Path $env:TEMP "ios_triage_temp.json"
+    $allData | Out-File -FilePath $tempJson -Encoding utf8
+    
+    & $PythonPath -c "
+import json, sys
+from generate_report import generate_report
+with open(sys.argv[1], 'r', encoding='utf-8') as f:
+    raw = json.load(f)
+data = {
+    'info': raw.get('info', {}).get('data', {}),
+    'battery': raw.get('battery', {}).get('data', {}),
+    'apps': raw.get('apps', {}).get('data', []),
+    'crashes': raw.get('crashes', {}).get('data', {})
+}
+generate_report(data, sys.argv[2])
+" $tempJson $reportOutput
+
+    if (Test-Path $reportOutput) {
+        Write-Host ("`n[+] Laudo Forense HTML gerado em: {0}" -f $reportOutput) -ForegroundColor Green
+    }
+}
 Write-Host "==========================================================" -ForegroundColor Cyan
