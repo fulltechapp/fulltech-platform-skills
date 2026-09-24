@@ -1,6 +1,23 @@
 # Fulltech Platform Skills
 
-> **Multi-Harness Agent Skills, DevOps & Engineering Marketplace for Fulltech.**
+<p align="center">
+  <strong>🌐 Multi-Language Documentation</strong><br>
+  <a href="README.md"><b>English</b></a> •
+  <a href="README.pt-BR.md"><b>Português (Brasil)</b></a> •
+  <a href="README.es.md"><b>Español</b></a>
+</p>
+
+<p align="center">
+  <img src="https://img.shields.io/badge/Architecture-Multi--Harness-blue?style=flat-square" alt="Multi-Harness" />
+  <img src="https://img.shields.io/badge/Claude%20Code-Compatible-8A2BE2?style=flat-square" alt="Claude Code" />
+  <img src="https://img.shields.io/badge/Google%20Antigravity-Compatible-4285F4?style=flat-square" alt="Google Antigravity" />
+  <img src="https://img.shields.io/badge/skills.sh-Ecosystem-green?style=flat-square" alt="Skills.sh" />
+  <img src="https://img.shields.io/badge/License-MIT-lightgrey?style=flat-square" alt="License" />
+</p>
+
+---
+
+> **Enterprise-grade Multi-Harness Agent Skills, DevOps & Engineering Marketplace for Fulltech.**
 
 This repository hosts production-ready, modular skills designed to work seamlessly across modern AI coding agents and harnesses, including **Claude Code**, **Google Antigravity**, **Cursor**, **OpenAI Codex**, and **Orca**.
 
@@ -27,9 +44,9 @@ Install the desired plugin:
 ```
 
 ### 2. In Google Antigravity / Agentic Environments
-Clone or symlink the skill directory into your user or project agents directory:
+Clone or copy the skill directory into your user or project agents directory:
 ```bash
-# User-level (available across all workspaces)
+# Global user level (available across all workspaces)
 cp -r plugins/android-sanitizer ~/.agents/skills/
 ```
 
@@ -58,7 +75,9 @@ fulltech-platform-skills/
 │       │   └── triage.ps1          # Windows PowerShell helper
 │       └── references/
 │           └── oem_catalog.json    # Vendor ad engines & bloatware database
-└── README.md
+├── README.md                       # English documentation
+├── README.pt-BR.md                 # Brazilian Portuguese documentation
+└── README.es.md                    # Spanish documentation
 ```
 
 ---
