@@ -140,26 +140,34 @@ if ($deviceConnected) {
         }
     }
 
-    # --- ACAO 3: SERVIDOR LOCAL DO PERFIL DNS AD-SINKHOLE ---
+    # --- ACAO 3: INSTALACAO DO PERFIL BLOQUEADOR DE ANUNCIOS (ADGUARD DNS) ---
     Write-Host "`n------------------------------------------------------------------------" -ForegroundColor DarkGray
     Write-Host " 3. ATIVACAO DO BLOQUEADOR NATIVO DE ANUNCIOS (ADGUARD DNS)" -ForegroundColor White
     Write-Host "------------------------------------------------------------------------" -ForegroundColor DarkGray
 
+    $profileFile = Join-Path (Split-Path -Parent $scriptDir) "profiles\adguard_dns.mobileconfig"
     $confirmDNS = "S"
     if (-not $AutoConfirm) {
-        $promptDNS = Read-Host "[?] Deseja iniciar o servidor de perfil DNS local para instalacao no iPhone? [S/N]"
+        $promptDNS = Read-Host "[?] Deseja enviar o Perfil AdGuard DNS diretamente para o iPhone via cabo USB? [S/N]"
         if ($promptDNS) { $confirmDNS = $promptDNS.Trim().ToUpper() }
     }
 
     if ($confirmDNS -eq "S" -or $confirmDNS -eq "Y") {
-        # Obter IP Local na LAN
-        $localIP = (Get-NetIPAddress -AddressFamily IPv4 | Where-Object { $_.InterfaceAlias -notmatch 'vEthernet|Loopback|Virtual' -and $_.IPAddress -notmatch '^127\.' } | Select-Object -First 1).IPAddress
-        if (-not $localIP) { $localIP = "127.0.0.1" }
-
-        Start-Process -FilePath $PythonPath -ArgumentList "`"$serveScript`"" -WindowStyle Hidden -ErrorAction SilentlyContinue
-        Write-Host ("[+] Servidor de Perfil ativo na rede local: http://{0}:8080/adguard.mobileconfig" -f $localIP) -ForegroundColor Green
-        $actionsCompleted.Add("Servidor de perfil DNS criptografado iniciado na LAN (http://$localIP:8080/adguard.mobileconfig)")
-        $actionsPending.Add("Instalar e autorizar o Perfil DNS diretamente no iPhone via Safari")
+        Write-Host "[*] Enviando perfil criptografado diretamente pelo barramento USB..." -ForegroundColor Cyan
+        $pushRaw = & $PythonPath $remediateHelper "install_profile" $profileFile 2>&1 | Out-String
+        try {
+            $pushObj = $pushRaw | ConvertFrom-Json
+            if ($pushObj.status -eq "success") {
+                Write-Host ("[+] SUCESSO: {0}" -f $pushObj.message) -ForegroundColor Green
+                $actionsCompleted.Add("Perfil AdGuard DNS enviado diretamente para a tela do iPhone via cabo USB")
+                $actionsPending.Add("Confirmar instalacao do perfil no iPhone em Ajustes > Perfil Baixado")
+            } else {
+                Write-Host ("[-] Falha ao enviar via USB: {0}" -f $pushObj.message) -ForegroundColor Yellow
+                $actionsPending.Add("Instalar perfil via Safari (adguard-dns.io ou servidor local)")
+            }
+        } catch {
+            Write-Host $pushRaw
+        }
     }
 
 } else {
@@ -175,6 +183,10 @@ if ($deviceConnected) {
     $actionsPending.Add("Aliviar o Limitador de Clock da CPU em Ajustes > Bateria (opcional)")
     $actionsPending.Add("Realizar a substituicao fisica da bateria em assistencia tecnica")
 }
+
+# Descobrir IP real da LAN para instrucoes de rede local
+$realLANIP = & $PythonPath -c "import socket; s=socket.socket(socket.AF_INET, socket.SOCK_DGRAM); s.connect(('8.8.8.8', 80)); print(s.getsockname()[0]); s.close()" 2>&1
+if (-not $realLANIP -or $realLANIP -match "error") { $realLANIP = "192.168.31.62" }
 
 # --- RELATORIO CONSOLIDADO DE EXECUCAO ---
 Write-Host "`n========================================================================" -ForegroundColor Green
@@ -197,16 +209,19 @@ Write-Host "    3. Toque em 'Apagar App' e confirme em 'Apagar'" -ForegroundColo
 Write-Host "  (Ou va em: Ajustes > Geral > Armazenamento do iPhone > CopyMyData > Apagar App)" -ForegroundColor DarkGray
 
 Write-Host "`n--- PASSO 2: ATIVACAO DO BLOQUEADOR NATIVO DE ANUNCIOS (ADGUARD DNS) ---" -ForegroundColor White
-Write-Host "  Onde ir: Abra o navegador Safari no iPhone" -ForegroundColor Gray
-Write-Host "  O que digitar: Acesse http://192.168.15.5:8080/adguard.mobileconfig" -ForegroundColor Cyan
-Write-Host "  O que clicar:" -ForegroundColor Gray
-Write-Host "    1. Toque em 'Permitir' no aviso: 'Este site esta tentando baixar um perfil de configuracao'" -ForegroundColor Cyan
-Write-Host "    2. Abra o aplicativo 'Ajustes' no seu iPhone" -ForegroundColor Cyan
-Write-Host "    3. Logo abaixo do seu nome, toque em 'Perfil Baixado'" -ForegroundColor Cyan
+Write-Host "  Como instalar (3 opcoes a sua escolha):" -ForegroundColor Gray
+Write-Host "    Opcao A (Pelo Cabo USB): Execute este script com o iPhone plugado. Ele envia o perfil direto para a tela." -ForegroundColor Green
+Write-Host "    Opcao B (Sem Computador): No Safari do iPhone, acesse https://adguard-dns.io/pt_br/public-dns.html" -ForegroundColor Cyan
+Write-Host "                              (Toque em 'iOS' e depois em 'Baixar Perfil') ou https://apple.nextdns.io" -ForegroundColor Cyan
+Write-Host ("    Opcao C (Servidor Local): No Safari do iPhone conectado ao mesmo Wi-Fi, acesse http://{0}:8080/adguard.mobileconfig" -f $realLANIP) -ForegroundColor Cyan
+Write-Host "                              (Nota: 'serve_profile.py' roda no IP real do seu PC)" -ForegroundColor DarkGray
+Write-Host "  Apos baixar/receber o perfil, onde clicar no iPhone:" -ForegroundColor Gray
+Write-Host "    1. Abra o aplicativo 'Ajustes' no seu iPhone" -ForegroundColor Cyan
+Write-Host "    2. Logo abaixo do seu nome, toque em 'Perfil Baixado'" -ForegroundColor Cyan
 Write-Host "       (Caso nao apareca, va em: Ajustes > Geral > VPN e Gerenciamento de Dispositivos)" -ForegroundColor DarkGray
-Write-Host "    4. No canto superior direito, toque em 'Instalar'" -ForegroundColor Cyan
-Write-Host "    5. Digite o codigo de 6 digitos de desbloqueio do iPhone" -ForegroundColor Cyan
-Write-Host "    6. Toque novamente em 'Instalar' no rodape da tela para confirmar" -ForegroundColor Cyan
+Write-Host "    3. No canto superior direito, toque em 'Instalar'" -ForegroundColor Cyan
+Write-Host "    4. Digite o codigo de 6 digitos de desbloqueio do iPhone" -ForegroundColor Cyan
+Write-Host "    5. Toque novamente em 'Instalar' no rodape da tela para confirmar" -ForegroundColor Cyan
 
 Write-Host "`n--- PASSO 3: ALIVIO TEMPORARIO DO THROTTLING DA CPU (OPCIONAL) ---" -ForegroundColor White
 Write-Host "  Onde ir: Abra o aplicativo 'Ajustes' no iPhone" -ForegroundColor Gray

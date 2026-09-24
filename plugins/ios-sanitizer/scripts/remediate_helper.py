@@ -78,6 +78,21 @@ async def action_check_app(bundle_id):
     except Exception as e:
         return {"status": "error", "message": str(e)}
 
+async def action_install_profile(profile_path):
+    try:
+        lockdown = await get_lockdown()
+        from pymobiledevice3.services.mobileconfig import MobileConfigService
+        async with MobileConfigService(lockdown) as mcs:
+            with open(profile_path, 'rb') as f:
+                content = f.read()
+            await mcs.install_profile(content)
+            return {
+                "status": "success",
+                "message": "Perfil enviado com sucesso via cabo USB! O alerta de instalacao foi aberto diretamente na tela do iPhone."
+            }
+    except Exception as e:
+        return {"status": "error", "message": str(e)}
+
 async def main():
     if len(sys.argv) < 2:
         print(json.dumps({"status": "error", "message": "Nenhuma acao especificada"}))
@@ -95,6 +110,11 @@ async def main():
             res = {"status": "error", "message": "ID do perfil obrigatorio"}
         else:
             res = await action_remove_profile(sys.argv[2])
+    elif action == "install_profile":
+        if len(sys.argv) < 3:
+            res = {"status": "error", "message": "Caminho do arquivo .mobileconfig obrigatorio"}
+        else:
+            res = await action_install_profile(sys.argv[2])
     elif action == "check_app":
         bundle_id = sys.argv[2] if len(sys.argv) > 2 else "com.mediamushroom.copymydata2"
         res = await action_check_app(bundle_id)

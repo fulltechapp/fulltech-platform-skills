@@ -647,23 +647,52 @@ HTML_TEMPLATE = """<!DOCTYPE html>
                     <span class="step-badge">1</span>
                     <span class="step-title">Ativação do Bloqueador Nativo de Anúncios (DNS AdGuard)</span>
                 </div>
+                <p style="font-size: 13px; color: var(--text-muted); margin-bottom: 14px;">
+                    O bloqueador opera de forma nativa no iOS via <strong>DNS-over-HTTPS criptografado</strong>, eliminando 100% dos anúncios de jogos casuais e banners em sites sem gastar bateria nem exigir apps de VPN. Você pode ativá-lo por qualquer um dos 3 métodos abaixo:
+                </p>
+
+                <div style="background: rgba(16, 185, 129, 0.08); border: 1px solid rgba(16, 185, 129, 0.25); border-radius: 10px; padding: 14px; margin-bottom: 14px;">
+                    <div style="font-size: 13px; font-weight: 700; color: var(--accent); margin-bottom: 4px;">
+                        Opção 1 (Mais Rápida): Envio Direto via Cabo USB
+                    </div>
+                    <div style="font-size: 13px; color: #CBD5E1;">
+                        Com o iPhone plugado no cabo, execute o script de remediação: <code class="kbd-action">powershell remediate.ps1</code>. O script envia o perfil diretamente pelo cabo para a tela do iPhone, sem precisar digitar nenhum link no Safari.
+                    </div>
+                </div>
+
+                <div style="background: rgba(56, 189, 248, 0.08); border: 1px solid rgba(56, 189, 248, 0.25); border-radius: 10px; padding: 14px; margin-bottom: 14px;">
+                    <div style="font-size: 13px; font-weight: 700; color: var(--cyan); margin-bottom: 4px;">
+                        Opção 2 (Sem Computador): Download Oficial no Safari do iPhone
+                    </div>
+                    <div style="font-size: 13px; color: #CBD5E1;">
+                        Abra o Safari no iPhone e acesse o site oficial da AdGuard: <code class="kbd-action">https://adguard-dns.io/pt_br/public-dns.html</code> (selecione <strong>iOS</strong> e toque em <strong>Baixar Perfil</strong>) ou pelo gerador da NextDNS: <code class="kbd-action">https://apple.nextdns.io</code>.
+                    </div>
+                </div>
+
+                <div style="background: rgba(255, 255, 255, 0.03); border: 1px solid var(--border); border-radius: 10px; padding: 14px; margin-bottom: 14px;">
+                    <div style="font-size: 13px; font-weight: 700; color: var(--text); margin-bottom: 4px;">
+                        Opção 3: Servidor Local Temporário na sua Rede Wi-Fi
+                    </div>
+                    <div style="font-size: 13px; color: #CBD5E1; line-height: 1.5;">
+                        Se você iniciar o servidor local pelo script do computador (<code class="kbd-action">serve_profile.py</code>), acesse no Safari do iPhone conectado ao mesmo Wi-Fi: <code class="kbd-action">http://{{LAN_IP}}:8080/adguard.mobileconfig</code>. <em>(Este endereço é o IP real do seu PC na sua rede local)</em>.
+                    </div>
+                </div>
+
                 <div class="nav-path">
-                    <span>Safari</span>
-                    <span class="nav-arrow">▶</span>
-                    <span>http://192.168.15.5:8080/adguard.mobileconfig</span>
-                    <span class="nav-arrow">▶</span>
-                    <span>Ajustes</span>
+                    <span>Ajustes do iPhone</span>
                     <span class="nav-arrow">▶</span>
                     <span>Perfil Baixado</span>
+                    <span class="nav-arrow">▶</span>
+                    <span>Instalar</span>
+                    <span class="nav-arrow">▶</span>
+                    <span>Senha de 6 Dígitos</span>
                 </div>
                 <ul class="step-clicks">
-                    <li>No iPhone conectado ao mesmo Wi-Fi, abra o <strong>Safari</strong> e digite: <code class="kbd-action">http://192.168.15.5:8080/adguard.mobileconfig</code></li>
-                    <li>No aviso <em>"Este site está tentando baixar um perfil de configuração"</em>, toque em <span class="kbd-action">Permitir</span> e feche o aviso.</li>
+                    <li>Ao baixar o perfil por qualquer uma das opções, o iOS exibirá: <em>"Perfil Baixado"</em>.</li>
                     <li>Abra o aplicativo <span class="kbd-action">Ajustes</span> do iPhone.</li>
-                    <li>Logo no topo (abaixo do seu nome), toque na nova opção <span class="kbd-action">Perfil Baixado</span>.</li>
-                    <li>No canto superior direito, toque em <span class="kbd-action">Instalar</span>. Digite sua senha de 6 dígitos de desbloqueio.</li>
-                    <li>Toque novamente em <span class="kbd-action">Instalar</span> no rodapé da tela.</li>
-                    <li><em>Pronto! 100% dos anúncios de jogos, banners e pop-ups de sites serão bloqueados no sistema sem consumir bateria.</em></li>
+                    <li>Logo no topo (abaixo do seu nome), toque em <span class="kbd-action">Perfil Baixado</span> (ou em <em>Ajustes > Geral > VPN e Gerenciamento de Dispositivos</em>).</li>
+                    <li>No canto superior direito, toque em <span class="kbd-action">Instalar</span>. Digite sua senha de desbloqueio.</li>
+                    <li>Toque novamente em <span class="kbd-action">Instalar</span> no rodapé da tela para confirmar.</li>
                 </ul>
             </div>
 
@@ -722,9 +751,22 @@ HTML_TEMPLATE = """<!DOCTYPE html>
 </html>
 """
 
+def get_lan_ip():
+    import socket
+    s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+    try:
+        s.connect(('8.8.8.8', 80))
+        ip = s.getsockname()[0]
+    except Exception:
+        ip = '192.168.31.62'
+    finally:
+        s.close()
+    return ip
+
 def generate_report(data, output_path):
     health = data.get("battery", {}).get("HealthPercentage", 0)
     health_color = "#10B981" if health >= 80 else ("#F59E0B" if health >= 60 else "#F43F5E")
+    lan_ip = get_lan_ip()
     
     app_tags = ""
     for app in data.get("apps", []):
@@ -743,6 +785,7 @@ def generate_report(data, output_path):
         "{{TEMPERATURE}}": str(data.get("battery", {}).get("TemperatureC", 0)),
         "{{APP_COUNT}}": str(len(data.get("apps", []))),
         "{{APP_TAGS}}": app_tags,
+        "{{LAN_IP}}": lan_ip,
         "{{TIMESTAMP}}": datetime.datetime.now().strftime("%d/%m/%Y às %H:%M:%S")
     }
 
