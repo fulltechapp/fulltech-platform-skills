@@ -14,20 +14,35 @@
       },
       "category": "utilities",
       "source": {
-        "source": "dir",
-        "path": "./plugins/android-sanitizer"
+        "type": "github",
+        "repo": "fulltechapp/fulltech-platform-skills",
+        "path": "plugins/android-sanitizer"
       }
     },
     {
       "name": "ios-sanitizer",
-      "description": "Autonomous iOS device triage, adware remediation, battery wear inspection (cycle count & raw capacity via BMS), malicious configuration profile audit, and encrypted DNS ad-sinkhole setup via Apple Lockdown protocol.",
+      "description": "Autonomous iOS device triage, adware remediation, battery wear inspection, malicious configuration profile audit, and encrypted DNS ad-sinkhole setup.",
       "author": {
         "name": "Fulltech"
       },
       "category": "utilities",
       "source": {
-        "source": "dir",
-        "path": "./plugins/ios-sanitizer"
+        "type": "github",
+        "repo": "fulltechapp/fulltech-platform-skills",
+        "path": "plugins/ios-sanitizer"
+      }
+    },
+    {
+      "name": "windows-sanitizer",
+      "description": "Autonomous Windows PC triage, telemetry deactivation, UWP bloatware removal, and OS-level network sinkhole tracking blocking.",
+      "author": {
+        "name": "Fulltech"
+      },
+      "category": "utilities",
+      "source": {
+        "type": "github",
+        "repo": "fulltechapp/fulltech-platform-skills",
+        "path": "plugins/windows-sanitizer"
       }
     }
   ]

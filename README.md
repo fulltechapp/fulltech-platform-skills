@@ -146,7 +146,7 @@ fulltech-platform-skills/
 │   │   ├── scripts/
 │   │   │   ├── triage.ps1          # Windows health & telemetry audit script
 │   │   │   ├── remediate.ps1       # Admin sinkhole & debloat remediation
-│   │   │   └── generate_report.py  # Executive HTML Report engine
+│   │   │   └── generate_report.ps1 # Executive HTML Report engine
 ├── README.md                       # English documentation
 ├── README.pt-BR.md                 # Brazilian Portuguese documentation
 └── README.es.md                    # Spanish documentation
