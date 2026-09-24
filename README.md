@@ -72,6 +72,8 @@ Abort message: 'Attempted to retrieve value from failed HIDL call: Status(EX_TRA
 | Skill | Category | Description | Supported Harnesses |
 | :--- | :--- | :--- | :--- |
 | [`android-sanitizer`](./plugins/android-sanitizer/) | Mobile Forensics / Optimization | Autonomous Android triage, adware remediation, SOD diagnosis, OEM bloatware removal (Xiaomi, Samsung, Motorola, Transsion), and Private DNS ad-sinkhole automation. | Claude Code, Antigravity, Cursor, Codex, Orca |
+| [`ios-sanitizer`](./plugins/ios-sanitizer/) | Mobile Forensics / Optimization | Autonomous iOS triage, BMS health checks, malicious profile purging, and AdGuard DNS ad-sinkhole automation. | Claude Code, Antigravity, Cursor, Codex, Orca |
+| [`windows-sanitizer`](./plugins/windows-sanitizer/) | OS Forensics / Optimization | Autonomous Windows PC triage, telemetry deactivation, UWP bloatware removal, and OS-level network sinkhole tracking blocking. | Claude Code, Antigravity, Cursor, Codex, Orca |
 
 ---
 
@@ -86,6 +88,7 @@ Install the desired plugin:
 ```bash
 /plugin install android-sanitizer
 /plugin install ios-sanitizer
+/plugin install windows-sanitizer
 ```
 
 ### 2. In Google Antigravity / Agentic Environments
@@ -94,12 +97,14 @@ Clone or copy the skill directory into your user or project agents directory:
 # Global user level (available across all workspaces)
 cp -r plugins/android-sanitizer ~/.agents/skills/
 cp -r plugins/ios-sanitizer ~/.agents/skills/
+cp -r plugins/windows-sanitizer ~/.agents/skills/
 ```
 
 ### 3. Via Open Skills CLI (`skills.sh`)
 ```bash
 npx skills add fulltechapp/fulltech-platform-skills@android-sanitizer
 npx skills add fulltechapp/fulltech-platform-skills@ios-sanitizer
+npx skills add fulltechapp/fulltech-platform-skills@windows-sanitizer
 ```
 
 ---
@@ -134,6 +139,14 @@ fulltech-platform-skills/
 │       │   └── adguard_dns.mobileconfig # Native Apple DoH encrypted DNS payload
 │       └── references/
 │           └── ios_bundle_catalog.json # Known predatory cleaner apps & ad networks
+│   ├── windows-sanitizer/          # Autonomous Windows OS triage & debloater
+│   │   ├── .claude-plugin/
+│   │   │   └── plugin.json         # Claude plugin descriptor
+│   │   ├── SKILL.md                # Universal multi-harness agent instructions
+│   │   ├── scripts/
+│   │   │   ├── triage.ps1          # Windows health & telemetry audit script
+│   │   │   ├── remediate.ps1       # Admin sinkhole & debloat remediation
+│   │   │   └── generate_report.py  # Executive HTML Report engine
 ├── README.md                       # English documentation
 ├── README.pt-BR.md                 # Brazilian Portuguese documentation
 └── README.es.md                    # Spanish documentation
