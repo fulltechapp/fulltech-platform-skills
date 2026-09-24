@@ -3,14 +3,15 @@
     Android Sanitizer - Automated ADB Triage & Diagnostic Helper (PowerShell)
 .DESCRIPTION
     Audits connected Android device for adware, overlay abusers, vendor ad services,
-    and checks Private DNS status.
+    battery health, hardware lifespan, storage metrics, and Private DNS status.
 #>
 
 [CmdletBinding()]
 param(
     [switch]$WatchOverlay,
     [switch]$OpenDnsSettings,
-    [switch]$TestDns
+    [switch]$TestDns,
+    [switch]$HealthCheck
 )
 
 function Write-Section($title) {
@@ -33,11 +34,58 @@ if (-not $device) {
 $manufacturer = (adb shell getprop ro.product.manufacturer).Trim().ToLower()
 $model = (adb shell getprop ro.product.model).Trim()
 $androidVer = (adb shell getprop ro.build.version.release).Trim()
+$patch = (adb shell getprop ro.build.version.security_patch).Trim()
 
 Write-Section "Device Connected"
-Write-Host "Manufacturer: $manufacturer"
-Write-Host "Model:        $model"
-Write-Host "Android:      $androidVer"
+Write-Host "Manufacturer:   $manufacturer"
+Write-Host "Model:          $model"
+Write-Host "Android:        $androidVer"
+Write-Host "Security Patch: $patch"
+
+if ($HealthCheck) {
+    Write-Section "Hardware & Battery Health Analysis"
+    
+    # 1. Battery metrics
+    $batt = adb shell "dumpsys battery"
+    $level = ($batt | Select-String "\blevel:\s*(\d+)").Matches.Groups[1].Value
+    $voltageRaw = ($batt | Select-String "\bvoltage:\s*(\d+)").Matches.Groups[1].Value
+    $voltage = if ($voltageRaw) { [double]$voltageRaw / 1000 } else { 0 }
+    $tempRaw = ($batt | Select-String "\btemperature:\s*(\d+)").Matches.Groups[1].Value
+    $temp = if ($tempRaw) { [double]$tempRaw / 10 } else { 0 }
+    $healthCode = ($batt | Select-String "\bhealth:\s*(\d+)").Matches.Groups[1].Value
+    $healthMap = @{"1"="Unknown"; "2"="Good (Saudável)"; "3"="Overheat"; "4"="Dead"; "5"="Over Voltage"; "6"="Failure"; "7"="Cold"}
+    $healthStr = if ($healthMap.ContainsKey($healthCode)) { $healthMap[$healthCode] } else { "Unknown" }
+
+    $stats = adb shell "dumpsys batterystats --charged"
+    $estCap = ($stats | Select-String "Estimated battery capacity:\s*(\d+)\s*mAh").Matches.Groups[1].Value
+    $desCap = ($stats | Select-String "Capacity:\s*(\d+)").Matches.Groups[1].Value
+    if (-not $desCap) { $desCap = 4000 }
+    $healthPct = if ($estCap -and [int]$desCap -gt 0) { [math]::Round(([double]$estCap / [double]$desCap) * 100, 1) } else { "N/A" }
+
+    Write-Host "  Battery Level:       $level%" -ForegroundColor Green
+    Write-Host "  Battery Health:      $healthStr" -ForegroundColor Green
+    Write-Host "  Battery Voltage:     $voltage V"
+    Write-Host "  Battery Temperature: $temp °C"
+    Write-Host "  Estimated Capacity:  $estCap mAh (Design: $desCap mAh)"
+    Write-Host "  Battery Health Ratio: $healthPct%" -ForegroundColor $(if ($healthPct -ge 80) { "Green" } else { "Yellow" })
+
+    # 2. Thermal status
+    $thermal = adb shell "dumpsys thermalservice"
+    $tStatus = ($thermal | Select-String "Thermal Status:\s*(\d+)").Matches.Groups[1].Value
+    $tMap = @{"0"="Normal (Sem estrangulamento térmico)"; "1"="Light Throttling"; "2"="Moderate"; "3"="Severe"; "4"="Critical"}
+    $tStatusStr = if ($tMap.ContainsKey($tStatus)) { $tMap[$tStatus] } else { "Normal" }
+    Write-Host "  Thermal Status:      $tStatusStr" -ForegroundColor Green
+
+    # 3. Storage
+    $df = adb shell "df -h /data" | Select-Object -Skip 1
+    $sParts = ($df.Trim() -split "\s+")
+    Write-Host "  Storage /data:       $($sParts[2]) usado de $($sParts[1]) ($($sParts[3]) livre, $($sParts[4]) ocupado)"
+
+    # 4. RAM
+    $mem = adb shell "dumpsys meminfo" | Select-String "Total RAM:|Free RAM:|Used RAM:"
+    $mem | ForEach-Object { Write-Host "  $($_.Line.Trim())" }
+    exit 0
+}
 
 if ($WatchOverlay) {
     Write-Section "Watching Active Top Window (Ctrl+C to stop)"

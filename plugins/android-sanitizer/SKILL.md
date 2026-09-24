@@ -10,10 +10,12 @@ Comprehensive agent skill to audit, diagnose, clean, and protect Android devices
 ## Key Capabilities
 
 1. **Elderly Care & Casual User Protection**: Keeps harmless casual games (Mahjong, Candy Crush, Solitaire) and banking/medical apps intact while silencing their ads via Private DNS sinkhole.
-2. **Real-Time Forensic Catching**: Detects which package is popping up on screen right at the moment an ad appears (`mCurrentFocus` / `mFocusedApp`).
-3. **Permission & Overlay Auditing**: Identifies apps abusing `SYSTEM_ALERT_WINDOW` (drawing over other apps) and Accessibility Services.
-4. **OEM Bloatware Catalog**: Curated database for Xiaomi (HyperOS/MIUI), Samsung (One UI), Motorola, and Transsion (Infinix/Tecno).
-5. **Private DNS Sinkhole Guidance**: Automates opening the native Android Private DNS screen to configure AdGuard (`dns.adguard-dns.com`), stopping in-app ads at the network level.
+2. **Aggressive Performance Debloat**: Deep-cleans older devices, stripping duplicate video apps, preloaded bloat, analytics, and OEM telemetry to free RAM and CPU.
+3. **Hardware & Battery Health Diagnostics**: Audits battery capacity (learned vs. design mAh), wear percentage, thermal throttling status, and RAM/storage utilization.
+4. **Real-Time Forensic Catching**: Detects which package is popping up on screen right at the moment an ad appears (`mCurrentFocus` / `mFocusedApp`).
+5. **Permission & Overlay Auditing**: Identifies apps abusing `SYSTEM_ALERT_WINDOW` (drawing over other apps) and Accessibility Services.
+6. **OEM Bloatware Catalog**: Curated database for Xiaomi (HyperOS/MIUI), Samsung (One UI), Motorola, and Transsion (Infinix/Tecno).
+7. **Private DNS Sinkhole Guidance**: Automates opening the native Android Private DNS screen to configure AdGuard (`dns.adguard-dns.com`), stopping in-app ads at the network level.
 
 ---
 

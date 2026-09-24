@@ -28,13 +28,44 @@ fi
 manufacturer=$(adb shell getprop ro.product.manufacturer | tr -d '\r\n' | tr '[:upper:]' '[:lower:]')
 model=$(adb shell getprop ro.product.model | tr -d '\r\n')
 android_ver=$(adb shell getprop ro.build.version.release | tr -d '\r\n')
+patch=$(adb shell getprop ro.build.version.security_patch | tr -d '\r\n')
 
 log_section "Device Connected"
-echo "Manufacturer: $manufacturer"
-echo "Model:        $model"
-echo "Android:      $android_ver"
+echo "Manufacturer:   $manufacturer"
+echo "Model:          $model"
+echo "Android:        $android_ver"
+echo "Security Patch: $patch"
 
 case "$1" in
+    --health|--battery)
+        log_section "Hardware & Battery Health Analysis"
+        batt=$(adb shell dumpsys battery)
+        level=$(echo "$batt" | grep "level:" | awk '{print $2}')
+        temp_raw=$(echo "$batt" | grep "temperature:" | awk '{print $2}')
+        temp=$(awk "BEGIN {print $temp_raw / 10}")
+        health_code=$(echo "$batt" | grep "health:" | awk '{print $2}')
+        case "$health_code" in
+            2) health_str="Good (Saudável)" ;;
+            3) health_str="Overheat" ;;
+            4) health_str="Dead" ;;
+            5) health_str="Over Voltage" ;;
+            *) health_str="Unknown ($health_code)" ;;
+        esac
+        echo -e "${color_green}  Battery Level:       ${level}%${color_reset}"
+        echo -e "${color_green}  Battery Health:      ${health_str}${color_reset}"
+        echo "  Battery Temperature: ${temp} °C"
+
+        stats=$(adb shell "dumpsys batterystats --charged" || true)
+        est_cap=$(echo "$stats" | grep "Estimated battery capacity:" | awk '{print $4}' || true)
+        if [ -n "$est_cap" ]; then
+            echo "  Estimated Capacity:  ${est_cap} mAh"
+        fi
+
+        log_section "Storage & Memory (/data)"
+        adb shell df -h /data
+        adb shell dumpsys meminfo | grep -E "Total RAM:|Free RAM:|Used RAM:"
+        exit 0
+        ;;
     --watch)
         log_section "Watching Active Top Window (Ctrl+C to stop)"
         while true; do
