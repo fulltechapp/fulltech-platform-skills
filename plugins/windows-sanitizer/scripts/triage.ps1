@@ -69,6 +69,28 @@ if (Test-Path $telemetryKey) {
     }
 }
 
+# 6. WSL (host side): distros and virtual disk sizes, read from the registry
+# because `wsl -l -v` prints UTF-16 that is awkward to parse
+$wslInfo = $null
+$lxss = "HKCU:\Software\Microsoft\Windows\CurrentVersion\Lxss"
+if (Test-Path $lxss) {
+    $distros = @()
+    foreach ($key in Get-ChildItem $lxss) {
+        $d = Get-ItemProperty $key.PSPath
+        $vhdx = Join-Path $d.BasePath "ext4.vhdx"
+        $distros += @{
+            Name = $d.DistributionName
+            Version = $d.Version
+            VhdxGB = if (Test-Path -LiteralPath $vhdx) { [math]::Round((Get-Item -LiteralPath $vhdx).Length / 1GB, 2) } else { $null }
+        }
+    }
+    $wslConfigPath = "$env:USERPROFILE\.wslconfig"
+    $wslInfo = @{
+        Distros = $distros
+        WslConfig = if (Test-Path $wslConfigPath) { (Get-Content $wslConfigPath | Where-Object { $_ -match '^\s*(memory|swap|processors)\s*=' }) -join '; ' } else { $null }
+    }
+}
+
 # Compile Results
 $results = @{
     System = @{
@@ -90,7 +112,8 @@ $results = @{
         BloatwareCount = $detectedBloatware.Count
         DetectedBloatware = $detectedBloatware
     }
+    WSL = $wslInfo
 }
 
-$results | ConvertTo-Json -Depth 3 | Out-File -FilePath $OutputPath -Encoding utf8
+$results | ConvertTo-Json -Depth 4 | Out-File -FilePath $OutputPath -Encoding utf8
 Write-Host "[+] Triage concluido! Dados salvos em $OutputPath" -ForegroundColor Green

@@ -29,3 +29,10 @@ Run the remediation script to apply fixes (requires Administrator privileges):
 ```powershell
 powershell -ExecutionPolicy Bypass -File .\scripts\remediate.ps1
 ```
+
+### 3. WSL2 disks (optional)
+Triage reports each WSL distro and its `ext4.vhdx` size under `WSL`. To reclaim space the virtual disk never returns to Windows on its own (runs `wsl --shutdown`, then `Optimize-VHD` or `diskpart compact vdisk`):
+```powershell
+powershell -ExecutionPolicy Bypass -File .\scripts\remediate.ps1 -CompactWslDisks
+```
+For cleanup inside the distro, use `linux-sanitizer`.

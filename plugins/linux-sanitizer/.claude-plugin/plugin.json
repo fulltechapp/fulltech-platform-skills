@@ -1,0 +1,11 @@
+{
+  "name": "linux-sanitizer",
+  "version": "1.0.0",
+  "description": "Autonomous Linux and WSL triage (Ubuntu/Debian), disk-space recovery, telemetry deactivation, and hosts sinkhole. WSL detected automatically.",
+  "author": {
+    "name": "Fulltech"
+  },
+  "skills": [
+    "./"
+  ]
+}

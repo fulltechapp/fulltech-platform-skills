@@ -8,6 +8,10 @@ tmp/
 scratch/
 *.tmp
 
+# linux-sanitizer run outputs
+linux_triage.json
+linux_report.html
+
 # Python
 __pycache__/
 *.pyc

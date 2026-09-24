@@ -72,6 +72,7 @@ Abort message: 'Attempted to retrieve value from failed HIDL call: Status(EX_TRA
 | Skill | Categoria | Descrição | Harnesses Compatíveis |
 | :--- | :--- | :--- | :--- |
 | [`android-sanitizer`](./plugins/android-sanitizer/) | Perícia Mobile / Otimização | Triagem autônoma de dispositivos Android, remediação de adwares, diagnóstico de SOD, remoção de bloatwares de fabricantes (Xiaomi, Samsung, Motorola, Transsion) e sinkhole de anúncios via DNS Privado. | Claude Code, Antigravity, Cursor, Codex, Orca |
+| [`linux-sanitizer`](./plugins/linux-sanitizer/) | Perícia de SO / Otimização | Triagem autônoma de Linux e WSL (Ubuntu/Debian), recuperação de espaço em disco, desativação de telemetria e sinkhole via hosts. WSL detectado automaticamente. | Claude Code, Antigravity, Cursor, Codex, Orca |
 
 ---
 
@@ -86,6 +87,7 @@ Instale a skill desejada:
 ```bash
 /plugin install android-sanitizer
 /plugin install ios-sanitizer
+/plugin install linux-sanitizer
 ```
 
 ### 2. No Google Antigravity / Ambientes com Agent Skills
@@ -94,12 +96,14 @@ Copie ou crie um link simbólico da pasta da skill para o diretório de skills d
 # Nível global de usuário (disponível em todos os workspaces)
 cp -r plugins/android-sanitizer ~/.agents/skills/
 cp -r plugins/ios-sanitizer ~/.agents/skills/
+cp -r plugins/linux-sanitizer ~/.agents/skills/
 ```
 
 ### 3. Pelo CLI Aberto de Skills (`skills.sh`)
 ```bash
 npx skills add fulltechapp/fulltech-platform-skills@android-sanitizer
 npx skills add fulltechapp/fulltech-platform-skills@ios-sanitizer
+npx skills add fulltechapp/fulltech-platform-skills@linux-sanitizer
 ```
 
 ---
@@ -122,6 +126,14 @@ fulltech-platform-skills/
 │   │   │   └── triage.ps1          # Utilitário Windows PowerShell (-HealthCheck, -AuditSOD)
 │   │   └── references/
 │   │       └── oem_catalog.json    # Catálogo de motores de anúncios e bloatwares por fabricante
+│   ├── linux-sanitizer/            # Triagem e limpeza de Linux e WSL
+│   │   ├── .claude-plugin/
+│   │   │   └── plugin.json
+│   │   ├── SKILL.md
+│   │   └── scripts/
+│   │       ├── triage.sh           # Read-only triage (Linux/WSL) -> linux_triage.json
+│   │       ├── remediate.sh        # Dry-run-first remediation
+│   │       └── generate_report.py  # HTML report
 │   └── ios-sanitizer/              # Skill de triagem forense e performance iOS
 │       ├── .claude-plugin/
 │       │   └── plugin.json         # Manifesto do plugin Claude

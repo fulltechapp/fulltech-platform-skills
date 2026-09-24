@@ -32,6 +32,15 @@
       },
       "category": "utilities",
       "source": "./plugins/windows-sanitizer"
+    },
+    {
+      "name": "linux-sanitizer",
+      "description": "Autonomous Linux and WSL triage (Ubuntu/Debian), disk-space recovery, telemetry deactivation, and hosts sinkhole. WSL detected automatically.",
+      "author": {
+        "name": "Fulltech"
+      },
+      "category": "utilities",
+      "source": "./plugins/linux-sanitizer"
     }
   ]
 }

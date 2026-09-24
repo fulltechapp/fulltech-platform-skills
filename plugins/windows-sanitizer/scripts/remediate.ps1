@@ -3,6 +3,7 @@ param (
     [switch]$DisableTelemetry,
     [switch]$RemoveBloatware,
     [switch]$ApplyHostsSinkhole,
+    [switch]$CompactWslDisks,
     [string[]]$ExcludeApps = @(),
     [string]$TriagePath = ".\windows_triage.json"
 )
@@ -35,7 +36,7 @@ foreach ($item in $ExcludeApps) {
     }
 }
 
-$hasExplicitFlags = $DisableTelemetry -or $RemoveBloatware -or $ApplyHostsSinkhole
+$hasExplicitFlags = $DisableTelemetry -or $RemoveBloatware -or $ApplyHostsSinkhole -or $CompactWslDisks
 
 function Should-Run {
     param([string]$ActionName, [bool]$FlagValue = $false)
@@ -128,6 +129,42 @@ if (Should-Run "Deseja adicionar regras de bloqueio de anuncios e rastreamento n
     }
 } else {
     Write-Host "[-] Insercao no hosts ignorada." -ForegroundColor DarkGray
+}
+
+# 4. Compactar discos do WSL2 (ext4.vhdx so cresce; espaco liberado no Linux nao volta ao Windows sozinho)
+Write-Host "`n[4] Discos virtuais do WSL2 (ext4.vhdx)" -ForegroundColor Yellow
+$lxss = "HKCU:\Software\Microsoft\Windows\CurrentVersion\Lxss"
+$wslDistros = @()
+if (Test-Path $lxss) {
+    $wslDistros = @(Get-ChildItem $lxss | ForEach-Object { Get-ItemProperty $_.PSPath } | Where-Object { $_.Version -eq 2 })
+}
+if ($wslDistros.Count -eq 0) {
+    Write-Host "[-] Nenhuma distro WSL2 encontrada." -ForegroundColor DarkGray
+} elseif (Should-Run "Deseja compactar os discos do WSL2? (executa wsl --shutdown e fecha todas as distros)" $CompactWslDisks) {
+    wsl.exe --shutdown
+    foreach ($d in $wslDistros) {
+        $vhdx = Join-Path $d.BasePath "ext4.vhdx"
+        $vhdx = $vhdx -replace '^\\\\\?\\', ''
+        if (-not (Test-Path -LiteralPath $vhdx)) { continue }
+        $before = [math]::Round((Get-Item -LiteralPath $vhdx).Length / 1GB, 2)
+        try {
+            if (Get-Command Optimize-VHD -ErrorAction SilentlyContinue) {
+                Optimize-VHD -Path $vhdx -Mode Full -ErrorAction Stop
+            } else {
+                $script = "select vdisk file=`"$vhdx`"`r`nattach vdisk readonly`r`ncompact vdisk`r`ndetach vdisk`r`n"
+                $scriptPath = Join-Path $env:TEMP "wsl_compact.txt"
+                Set-Content -Path $scriptPath -Value $script -Encoding ASCII
+                diskpart /s $scriptPath | Out-Null
+                Remove-Item $scriptPath -ErrorAction SilentlyContinue
+            }
+            $after = [math]::Round((Get-Item -LiteralPath $vhdx).Length / 1GB, 2)
+            Write-Host "[+] $($d.DistributionName): $before GB -> $after GB" -ForegroundColor Green
+        } catch {
+            Write-Host "[!] Falha ao compactar $($d.DistributionName): $($_.Exception.Message)" -ForegroundColor Red
+        }
+    }
+} else {
+    Write-Host "[-] Compactacao do WSL ignorada." -ForegroundColor DarkGray
 }
 
 Write-Host "`n[+] Higienizacao do Windows concluida!" -ForegroundColor Green

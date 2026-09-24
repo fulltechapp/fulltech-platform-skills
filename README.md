@@ -74,6 +74,7 @@ Abort message: 'Attempted to retrieve value from failed HIDL call: Status(EX_TRA
 | [`android-sanitizer`](./plugins/android-sanitizer/) | Mobile Forensics / Optimization | Autonomous Android triage, adware remediation, SOD diagnosis, OEM bloatware removal (Xiaomi, Samsung, Motorola, Transsion), and Private DNS ad-sinkhole automation. | Claude Code, Antigravity, Cursor, Codex, Orca |
 | [`ios-sanitizer`](./plugins/ios-sanitizer/) | Mobile Forensics / Optimization | Autonomous iOS triage, BMS health checks, malicious profile purging, and AdGuard DNS ad-sinkhole automation. | Claude Code, Antigravity, Cursor, Codex, Orca |
 | [`windows-sanitizer`](./plugins/windows-sanitizer/) | OS Forensics / Optimization | Autonomous Windows PC triage, telemetry deactivation, UWP bloatware removal, and OS-level network sinkhole tracking blocking. | Claude Code, Antigravity, Cursor, Codex, Orca |
+| [`linux-sanitizer`](./plugins/linux-sanitizer/) | OS Forensics / Optimization | Autonomous Linux and WSL triage (Ubuntu/Debian), disk-space recovery, telemetry deactivation, and hosts sinkhole. WSL detected automatically. | Claude Code, Antigravity, Cursor, Codex, Orca |
 
 ---
 
@@ -88,6 +89,7 @@ Install the desired plugin:
 ```bash
 /plugin install android-sanitizer
 /plugin install ios-sanitizer
+/plugin install linux-sanitizer
 /plugin install windows-sanitizer
 ```
 
@@ -97,6 +99,7 @@ Clone or copy the skill directory into your user or project agents directory:
 # Global user level (available across all workspaces)
 cp -r plugins/android-sanitizer ~/.agents/skills/
 cp -r plugins/ios-sanitizer ~/.agents/skills/
+cp -r plugins/linux-sanitizer ~/.agents/skills/
 cp -r plugins/windows-sanitizer ~/.agents/skills/
 ```
 
@@ -104,6 +107,7 @@ cp -r plugins/windows-sanitizer ~/.agents/skills/
 ```bash
 npx skills add fulltechapp/fulltech-platform-skills@android-sanitizer
 npx skills add fulltechapp/fulltech-platform-skills@ios-sanitizer
+npx skills add fulltechapp/fulltech-platform-skills@linux-sanitizer
 npx skills add fulltechapp/fulltech-platform-skills@windows-sanitizer
 ```
 
@@ -139,6 +143,14 @@ fulltech-platform-skills/
 │       │   └── adguard_dns.mobileconfig # Native Apple DoH encrypted DNS payload
 │       └── references/
 │           └── ios_bundle_catalog.json # Known predatory cleaner apps & ad networks
+│   ├── linux-sanitizer/            # Autonomous Linux & WSL triage & cleanup
+│   │   ├── .claude-plugin/
+│   │   │   └── plugin.json
+│   │   ├── SKILL.md
+│   │   └── scripts/
+│   │       ├── triage.sh           # Read-only triage (Linux/WSL) -> linux_triage.json
+│   │       ├── remediate.sh        # Dry-run-first remediation
+│   │       └── generate_report.py  # HTML report
 │   ├── windows-sanitizer/          # Autonomous Windows OS triage & debloater
 │   │   ├── .claude-plugin/
 │   │   │   └── plugin.json         # Claude plugin descriptor
