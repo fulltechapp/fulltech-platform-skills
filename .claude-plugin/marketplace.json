@@ -1,0 +1,22 @@
+{
+  "": "https://anthropic.com/claude-code/marketplace.schema.json",
+  "name": "fulltech-platform-skills",
+  "description": "Fulltech Multi-Harness Agent Skills & DevOps Marketplace",
+  "owner": {
+    "name": "Fulltech"
+  },
+  "plugins": [
+    {
+      "name": "android-sanitizer",
+      "description": "Autonomous Android device triage, adware remediation, OEM bloatware cleaner, and DNS ad-sinkhole setup via ADB.",
+      "author": {
+        "name": "Fulltech"
+      },
+      "category": "utilities",
+      "source": {
+        "source": "dir",
+        "path": "./plugins/android-sanitizer"
+      }
+    }
+  ]
+}

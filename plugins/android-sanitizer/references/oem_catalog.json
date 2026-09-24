@@ -1,0 +1,61 @@
+{
+  "version": "1.0.0",
+  "oems": {
+    "xiaomi": {
+      "names": ["xiaomi", "redmi", "poco"],
+      "ad_engines": [
+        { "package": "com.miui.msa.global", "description": "MIUI System Ads engine" },
+        { "package": "com.miui.analytics", "description": "MIUI Analytics & tracking" },
+        { "package": "com.xiaomi.discover", "description": "Xiaomi Discover store" },
+        { "package": "com.xiaomi.glgm", "description": "Xiaomi Game Center" },
+        { "package": "com.mi.appfinder", "description": "GetApps / AppFinder recommendation daemon" },
+        { "package": "com.xiaomi.mipicks", "description": "Mi Picks recommendation store" }
+      ],
+      "bloatware_pushers": [
+        { "package": "com.mi.globalminusscreen", "description": "App Vault / Minus Screen with ads" },
+        { "package": "com.mi.globalbrowser", "description": "Mi Browser with notification spam" },
+        { "package": "cn.wps.xiaomi.abroad.lite", "description": "WPS Office Lite with subscription popups" },
+        { "package": "com.miui.videoplayer", "description": "Mi Video with push clickbaits" },
+        { "package": "com.miui.player", "description": "Mi Music with push clickbaits" },
+        { "package": "com.amazon.appmanager", "description": "Amazon partner app manager" },
+        { "package": "com.facebook.appmanager", "description": "Facebook background updater" },
+        { "package": "com.facebook.system", "description": "Facebook system service" },
+        { "package": "com.facebook.services", "description": "Facebook background daemon" }
+      ]
+    },
+    "samsung": {
+      "names": ["samsung"],
+      "ad_engines": [
+        { "package": "com.samsung.android.app.spage", "description": "Samsung Free / Daily sponsored feeds" },
+        { "package": "com.samsung.android.game.gamehome", "description": "Game Launcher with ad banners" }
+      ],
+      "bloatware_pushers": [
+        { "package": "com.samsung.android.ipsgeofence", "description": "Samsung Visit-In location ads" },
+        { "package": "com.samsung.android.dynamiclock", "description": "Wallpaper stories / Glance ads" }
+      ]
+    },
+    "motorola": {
+      "names": ["motorola", "lenovo"],
+      "ad_engines": [
+        { "package": "com.motorola.mobileservice", "description": "Motorola mobile services promotions" },
+        { "package": "com.glance.internet", "description": "Glance lockscreen stories & ads" }
+      ]
+    },
+    "transsion": {
+      "names": ["infinix", "tecno", "itel"],
+      "ad_engines": [
+        { "package": "com.transsion.phonemaster", "description": "Phone Master intrusive ad push" },
+        { "package": "com.transsion.palmsore", "description": "Palm Store intrusive recommendations" },
+        { "package": "com.transsion.ahagames", "description": "AHA Games promo popups" }
+      ]
+    }
+  },
+  "sinkhole": {
+    "recommended_dns": "dns.adguard-dns.com",
+    "alternatives": [
+      { "name": "AdGuard Family", "hostname": "family.adguard-dns.com" },
+      { "name": "Mullvad AdBlock", "hostname": "adblock.doh.mullvad.net" }
+    ],
+    "verification_target": "pagead2.googlesyndication.com"
+  }
+}

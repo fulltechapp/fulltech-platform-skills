@@ -1,0 +1,12 @@
+{
+  "name": "android-sanitizer",
+  "version": "1.0.0",
+  "description": "Autonomous Android device triage, adware remediation, OEM bloatware cleaner, and DNS ad-sinkhole setup via ADB.",
+  "author": {
+    "name": "Fulltech"
+  },
+  "category": "utilities",
+  "skills": [
+    "./SKILL.md"
+  ]
+}

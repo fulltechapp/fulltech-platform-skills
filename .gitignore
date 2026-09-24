@@ -1,0 +1,17 @@
+# Operating system
+.DS_Store
+Thumbs.db
+
+# Logs and temp files
+*.log
+tmp/
+scratch/
+*.tmp
+
+# Python
+__pycache__/
+*.pyc
+
+# Local agent caches
+.claude/session-env/
+.gemini/
