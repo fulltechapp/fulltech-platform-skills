@@ -10,12 +10,13 @@ Comprehensive agent skill to audit, diagnose, clean, and protect Android devices
 ## Key Capabilities
 
 1. **Elderly Care & Casual User Protection**: Keeps harmless casual games (Mahjong, Candy Crush, Solitaire) and banking/medical apps intact while silencing their ads via Private DNS sinkhole.
-2. **Aggressive Performance Debloat**: Deep-cleans older devices, stripping duplicate video apps, preloaded bloat, analytics, and OEM telemetry to free RAM and CPU.
-3. **Hardware & Battery Health Diagnostics**: Audits battery capacity (learned vs. design mAh), wear percentage, thermal throttling status, and RAM/storage utilization.
-4. **Real-Time Forensic Catching**: Detects which package is popping up on screen right at the moment an ad appears (`mCurrentFocus` / `mFocusedApp`).
-5. **Permission & Overlay Auditing**: Identifies apps abusing `SYSTEM_ALERT_WINDOW` (drawing over other apps) and Accessibility Services.
-6. **OEM Bloatware Catalog**: Curated database for Xiaomi (HyperOS/MIUI), Samsung (One UI), Motorola, and Transsion (Infinix/Tecno).
-7. **Private DNS Sinkhole Guidance**: Automates opening the native Android Private DNS screen to configure AdGuard (`dns.adguard-dns.com`), stopping in-app ads at the network level.
+2. **Cascade Ad-Loop Detection & Interactive Questionnaire**: Identifies "domino effect" installations (ad chains where users accidentally install 4-8 apps in a tight cluster, marked by launcher blue dots) and prompts the user via an interactive questionnaire.
+3. **Aggressive Performance Debloat**: Deep-cleans older devices, stripping duplicate video apps, preloaded bloat, analytics, and OEM telemetry to free RAM and CPU.
+4. **Hardware & Battery Health Diagnostics**: Audits battery capacity (learned vs. design mAh), wear percentage, thermal throttling status, and RAM/storage utilization.
+5. **Real-Time Forensic Catching**: Detects which package is popping up on screen right at the moment an ad appears (`mCurrentFocus` / `mFocusedApp`).
+6. **Permission & Overlay Auditing**: Identifies apps abusing `SYSTEM_ALERT_WINDOW` (drawing over other apps) and Accessibility Services.
+7. **OEM Bloatware Catalog**: Curated database for Xiaomi (HyperOS/MIUI), Samsung (One UI), Motorola, and Transsion (Infinix/Tecno).
+8. **Private DNS Sinkhole Guidance**: Automates opening the native Android Private DNS screen to configure AdGuard (`dns.adguard-dns.com`), stopping in-app ads at the network level.
 
 ---
 
@@ -66,20 +67,23 @@ adb shell "pm list packages -3 -f"
 adb shell "pm list packages | grep webapk"
 ```
 
-#### D. Audit Notification Spammers
+#### E. Detect Cascade Ad-Loop Installs (The "Blue Dot" Effect)
+Users often get trapped in a domino ad installation loop where multiple apps are downloaded within minutes and never opened (indicated by a blue dot on launchers like MIUI/HyperOS):
 ```bash
-adb shell "dumpsys notification --noredact" | grep -E "pkg=|NotificationRecord"
+# Cluster installs by timestamp
+adb shell dumpsys package | grep -E "Package \[|firstInstallTime"
 ```
 
 ---
 
-### Step 3: Categorization & User Alignment
+### Step 3: Categorization & Interactive Questionnaire
 
-Group packages into clear buckets before touching anything:
+Before modifying the device, present findings using an **interactive questionnaire** (or `ask_question` tool) so the user has full control over nuanced decisions (e.g. keeping specific casual games or removing a cascade batch):
 
 | Category | Description | Examples | Action |
 | :--- | :--- | :--- | :--- |
 | **SAFEGUARD** | Personal, banking, medical, messaging, authenticators | WhatsApp, Itaú, Gov.br, Meu INSS, Fleury, Photos | **DO NOT TOUCH** |
+| **CASCADE BATCH** | Apps installed in an ad loop on the same day/hour (blue dots) | CapCut, Tile Trip, Block Juggle, Words of Wonders | **PROMPT VIA QUESTIONNAIRE** |
 | **PRESERVE & SINKHOLE** | Casual games user enjoys, but filled with aggressive ads | Candy Crush, Mahjong Tile, Solitaire | **KEEP, neutralize via DNS** |
 | **OEM AD ENGINES** | Built-in vendor ad engines & app recommendation stores | Xiaomi MSA, GetApps, Game Center, App Vault | **UNINSTALL (User 0)** |
 | **ROGUE ADWARE / BLOAT** | Malicious cleaners, battery boosters, preloaded junk | Fake cleaners, Amazon AppManager, WPS Lite | **UNINSTALL (User 0)** |
