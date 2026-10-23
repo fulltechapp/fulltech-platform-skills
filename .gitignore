@@ -19,3 +19,7 @@ __pycache__/
 # Local agent caches
 .claude/session-env/
 .gemini/
+
+# Agent worktrees and engine-generated mod types
+.claude/worktrees/
+plugins/*/.claude-plugin/types/

@@ -75,6 +75,7 @@ Abort message: 'Attempted to retrieve value from failed HIDL call: Status(EX_TRA
 | [`ios-sanitizer`](./plugins/ios-sanitizer/) | Mobile Forensics / Optimization | Autonomous iOS triage, BMS health checks, malicious profile purging, and AdGuard DNS ad-sinkhole automation. | Claude Code, Antigravity, Cursor, Codex, Orca |
 | [`windows-sanitizer`](./plugins/windows-sanitizer/) | OS Forensics / Optimization | Autonomous Windows PC triage, telemetry deactivation, UWP bloatware removal, and OS-level network sinkhole tracking blocking. | Claude Code, Antigravity, Cursor, Codex, Orca |
 | [`linux-sanitizer`](./plugins/linux-sanitizer/) | OS Forensics / Optimization | Autonomous Linux and WSL triage (Ubuntu/Debian), disk-space recovery, telemetry deactivation, and hosts sinkhole. WSL detected automatically. | Claude Code, Antigravity, Cursor, Codex, Orca |
+| [`ft-progresso`](./plugins/ft-progresso/) | Developer Workflow | Claude Code mod: progress band above the prompt and `/progresso` pane reading Backlog.md, BMad tickets, `.devtool` and `progresso.md`, in the Fulltech design system. | Claude Code |
 
 ---
 
@@ -91,6 +92,7 @@ Install the desired plugin:
 /plugin install ios-sanitizer
 /plugin install linux-sanitizer
 /plugin install windows-sanitizer
+/plugin install ft-progresso@fulltech-platform-skills
 ```
 
 ### 2. In Google Antigravity / Agentic Environments

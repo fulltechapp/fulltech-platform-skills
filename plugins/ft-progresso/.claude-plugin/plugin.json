@@ -1,0 +1,17 @@
+{
+  "name": "ft-progresso",
+  "version": "0.1.0",
+  "description": "Faixa acima do prompt e painel /progresso com o andamento dos planos do repo: Backlog.md, tickets BMad, .devtool e progresso.md, no Design System Fulltech",
+  "author": { "name": "Fulltech", "url": "https://github.com/fulltechapp" },
+  "homepage": "https://github.com/fulltechapp/fulltech-platform-skills/tree/main/plugins/ft-progresso",
+  "license": "MIT",
+  "types": "./types/index.d.ts",
+  "userConfig": {
+    "nome": {
+      "type": "string",
+      "title": "Teu nome no quem:",
+      "description": "Item esperando por esse nome (quem: no progresso.md e no .devtool, assignee no Backlog.md) conta como esperando você, além de você, eu e me. Pode deixar vazio.",
+      "default": ""
+    }
+  }
+}

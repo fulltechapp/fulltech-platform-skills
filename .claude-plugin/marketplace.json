@@ -41,6 +41,15 @@
       },
       "category": "utilities",
       "source": "./plugins/linux-sanitizer"
+    },
+    {
+      "name": "ft-progresso",
+      "description": "Progress band above the prompt and /progresso pane for the repo's plans: Backlog.md, BMad tickets, .devtool and progresso.md, in the Fulltech design system.",
+      "author": {
+        "name": "Fulltech"
+      },
+      "category": "productivity",
+      "source": "./plugins/ft-progresso"
     }
   ]
 }
