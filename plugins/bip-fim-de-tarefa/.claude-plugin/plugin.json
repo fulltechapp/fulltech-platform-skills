@@ -1,0 +1,1 @@
+{ "name": "bip-fim-de-tarefa", "version": "0.1.0", "license": "MIT", "description": "Toca um bip e mostra um resumo quando o Claude ou um subagente termina uma tarefa" }

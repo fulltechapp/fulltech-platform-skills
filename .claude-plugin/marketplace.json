@@ -50,6 +50,15 @@
       },
       "category": "productivity",
       "source": "./plugins/ft-progresso"
+    },
+    {
+      "name": "bip-fim-de-tarefa",
+      "description": "Mod do Claude Code: bip e resumo quando um turno ou subagente termina, e linha de status com a ferramenta em uso.",
+      "author": {
+        "name": "Fulltech"
+      },
+      "category": "utilities",
+      "source": "./plugins/bip-fim-de-tarefa"
     }
   ]
 }
