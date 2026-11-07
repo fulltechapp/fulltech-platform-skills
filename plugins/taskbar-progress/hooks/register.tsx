@@ -1,4 +1,4 @@
-// register.tsx — o mod `ft-progresso`: faixa acima do prompt com uma linha por plano vivo, painel
+// register.tsx — o mod `taskbar-progress`: faixa acima do prompt com uma linha por plano vivo, painel
 // /progresso com um cartão por plano (DS Fulltech: anel de %, barras no degradê emerald -> cyan, o
 // feixe atravessando a barra ao abrir e ao fechar item), conferência de PR pelo gh e a regra de manter
 // cada board verdadeiro no prompt (só para os boards que o projeto tem). Derivado do `progresso` do
@@ -13,8 +13,8 @@ import { barra, estadoReal, linhasDaFaixa, osc94, parseProgresso, placar, quemVo
 import { ANEL, anelCells, barraCells } from './raster'
 
 const PANE = 'progresso'
-const sprints = atom({ plugin: 'ft-progresso', key: 'sprints' } as const, [])
-const prs = atom({ plugin: 'ft-progresso', key: 'prs' } as const, {})
+const sprints = atom({ plugin: 'taskbar-progress', key: 'sprints' } as const, [])
+const prs = atom({ plugin: 'taskbar-progress', key: 'prs' } as const, {})
 
 const RELER_MS = 10_000
 const GH_MS = 5 * 60_000
@@ -266,7 +266,7 @@ export const register: Register = (on, options) => {
     const r = await next(e)
     const origens = new Set((await read($, sprints)).map((s) => s.origem))
     if (origens.size === 0) return r
-    return { sections: [...r.sections, { id: 'ft-progresso:regra', text: regra(origens, quem), scope: 'session' }] }
+    return { sections: [...r.sections, { id: 'taskbar-progress:regra', text: regra(origens, quem), scope: 'session' }] }
   })
 
   on('ui.render', { component: 'AbovePrompt' }, async ($, e, next) => {

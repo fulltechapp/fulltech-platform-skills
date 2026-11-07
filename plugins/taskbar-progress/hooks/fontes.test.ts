@@ -77,7 +77,7 @@ test('.devtool: colunas no mapa comum, título sem o id, quem do label, ordem do
 })
 
 test('rótulo curto do lote', () => {
-  expect(['L0 Base', 'Wave VI · CRUD', 'Wave 2a', 'Épico 01a · x', 'Wave EN', 'Histórico (pré)', 'W1 ft-progresso'].map(rotulo))
+  expect(['L0 Base', 'Wave VI · CRUD', 'Wave 2a', 'Épico 01a · x', 'Wave EN', 'Histórico (pré)', 'W1 taskbar-progress'].map(rotulo))
     .toEqual(['L0', 'Wave VI', 'Wave 2a', 'Épico 01a', 'Wave EN', 'Histórico', 'W1'])
 })
 

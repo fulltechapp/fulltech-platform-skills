@@ -1,4 +1,4 @@
-# ft-progresso
+# taskbar-progress
 
 Mod do Claude Code que mostra, acima do prompt, quanto do plano do repo já foi feito e qual é o
 próximo item, e abre um painel com tudo em `/progresso`. Lê os quatro boards em uso na Fulltech:
@@ -36,14 +36,14 @@ Precisa do Claude Code 2.1.287 ou mais novo (`claude --version`).
 Dentro do Claude Code, uma linha (adiciona o marketplace se faltar; responda `y`):
 
 ```
-/plugin install ft-progresso --marketplace fulltechapp/fulltech-platform-skills
+/plugin install taskbar-progress --marketplace fulltechapp/fulltech-platform-skills
 ```
 
 Ou em dois passos, se o marketplace já estiver adicionado:
 
 ```
 /plugin marketplace add fulltechapp/fulltech-platform-skills
-/plugin install ft-progresso@fulltech-platform-skills
+/plugin install taskbar-progress@fulltech-platform-skills
 ```
 
 Escolha o escopo quando ele perguntar:
@@ -56,17 +56,17 @@ Fora do Claude Code (terminal):
 
 ```
 claude plugin marketplace add fulltechapp/fulltech-platform-skills
-claude plugin install ft-progresso@fulltech-platform-skills
+claude plugin install taskbar-progress@fulltech-platform-skills
 ```
 
 Depois de instalar, rode `/reload-plugins` (ou abra uma sessão nova). Verificar: num repo com
 Backlog.md a faixa aparece acima do prompt e `/progresso` abre o painel.
 
-Atualizar: `/plugin marketplace update fulltech-platform-skills`. Remover: `/plugin uninstall ft-progresso`.
+Atualizar: `/plugin marketplace update fulltech-platform-skills`. Remover: `/plugin uninstall taskbar-progress`.
 
 **Teu nome no `quem:`** (opcional): por padrão `você`, `eu` e `me` contam como esperando você.
 Para o assignee do Backlog.md (ex.: `@diogo`) contar também, ponha `diogo` em `/config`, na linha
-do `ft-progresso`.
+do `taskbar-progress`.
 
 ## O que ele acessa
 
@@ -85,12 +85,12 @@ Mod roda com o teu acesso. Este aqui:
 ## Desenvolvimento
 
 ```
-claude plugin validate plugins/ft-progresso
-claude plugin test plugins/ft-progresso
+claude plugin validate plugins/taskbar-progress
+claude plugin test plugins/taskbar-progress
 ```
 
 Parsers puros em `hooks/parse.ts` (progresso.md, placar, faixa) e `hooks/fontes.ts` (Backlog.md,
-BMad, .devtool), cada um com teste. Spec em `docs/ft-progresso/spec.md`.
+BMad, .devtool), cada um com teste. Spec em `docs/taskbar-progress/spec.md`.
 
 ## Créditos e licença
 

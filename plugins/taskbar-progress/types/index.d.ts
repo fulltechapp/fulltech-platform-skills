@@ -26,7 +26,7 @@ export type Sprint = {
 
 declare module 'claude-code' {
   interface PluginState {
-    'ft-progresso': {
+    'taskbar-progress': {
       sprints: Sprint[]
       /** número do PR -> MERGED | OPEN | CLOSED, da última leitura do gh */
       prs: Record<string, string>

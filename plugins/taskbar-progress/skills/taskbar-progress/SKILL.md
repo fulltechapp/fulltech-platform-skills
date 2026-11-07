@@ -1,11 +1,11 @@
 ---
-name: ft-progresso
-description: "Mantém verdadeiro o board que o mod ft-progresso mostra na faixa acima do prompt e no /progresso: Backlog.md, tickets BMad, .devtool ou progresso.md. Use ao montar um plano com mais de uma etapa, quando o usuário pedir pra acompanhar o progresso, ou quando o estado de um item do plano mudar."
+name: taskbar-progress
+description: "Mantém verdadeiro o board que o mod taskbar-progress mostra na faixa acima do prompt e no /progresso: Backlog.md, tickets BMad, .devtool ou progresso.md. Use ao montar um plano com mais de uma etapa, quando o usuário pedir pra acompanhar o progresso, ou quando o estado de um item do plano mudar."
 ---
 
-# ft-progresso
+# taskbar-progress
 
-O mod `ft-progresso` lê o board do projeto e mostra quanto do plano foi feito e qual é o próximo
+O mod `taskbar-progress` lê o board do projeto e mostra quanto do plano foi feito e qual é o próximo
 item. Esta skill é o lado de quem escreve: escolher o board certo e mantê-lo verdadeiro.
 
 ## Qual board usar

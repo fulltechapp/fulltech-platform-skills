@@ -66,7 +66,7 @@ test('os três juntos, com a regra no prompt', async ($, on) => {
   await abrir($)
   expect((await $.command.run(RUN)).text).toBe('Painel de progresso aberto.')
   const r = await $.prompt.compose(COMPOSE)
-  const regra = r.sections.find((s) => s.id === 'ft-progresso:regra')
+  const regra = r.sections.find((s) => s.id === 'taskbar-progress:regra')
   expect(regra?.text).toContain('quem: <você |')
 })
 
@@ -83,7 +83,7 @@ test('a opção nome entra na regra', { options: { nome: 'Ana' } }, async ($, on
   on('prompt.compose', () => ({ sections: [] }))
   await abrir($)
   const r = await $.prompt.compose(COMPOSE)
-  expect(r.sections.find((s) => s.id === 'ft-progresso:regra')?.text).toContain('quem: <Ana |')
+  expect(r.sections.find((s) => s.id === 'taskbar-progress:regra')?.text).toContain('quem: <Ana |')
 })
 
 test('nome /progresso tomado: o mod segue lendo o plano e pondo a regra', async ($, on) => {
@@ -91,7 +91,7 @@ test('nome /progresso tomado: o mod segue lendo o plano e pondo a regra', async 
   on('prompt.compose', () => ({ sections: [] }))
   await abrir($)
   const r = await $.prompt.compose(COMPOSE)
-  expect(r.sections.find((s) => s.id === 'ft-progresso:regra')).toBeDefined()
+  expect(r.sections.find((s) => s.id === 'taskbar-progress:regra')).toBeDefined()
 })
 
 test('Backlog.md, BMad e .devtool juntos: um plano cada, e a regra de cada board', async ($, on) => {
@@ -107,7 +107,7 @@ test('Backlog.md, BMad e .devtool juntos: um plano cada, e a regra de cada board
   on('prompt.compose', () => ({ sections: [] }))
   await abrir($)
   expect((await $.command.run(RUN)).text).toBe('Painel de progresso aberto.')
-  const t = (await $.prompt.compose(COMPOSE)).sections.find((s) => s.id === 'ft-progresso:regra')?.text ?? ''
+  const t = (await $.prompt.compose(COMPOSE)).sections.find((s) => s.id === 'taskbar-progress:regra')?.text ?? ''
   expect(t).toContain('backlog task edit')
   expect(t).toContain('tickets.py mark')
   expect(t).toContain('card.sh')

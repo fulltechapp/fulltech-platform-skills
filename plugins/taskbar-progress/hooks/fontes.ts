@@ -1,5 +1,5 @@
 // fontes.ts — Backlog.md, tickets do BMad e o board .devtool virando Sprint, no mesmo mapa de estado
-// do progresso.md (docs/ft-progresso/spec.md). Puro: sem $.
+// do progresso.md (docs/taskbar-progress/spec.md). Puro: sem $.
 
 import type { Estado, Item, Lote, Sprint } from '../types'
 

@@ -75,7 +75,7 @@ Abort message: 'Attempted to retrieve value from failed HIDL call: Status(EX_TRA
 | [`ios-sanitizer`](./plugins/ios-sanitizer/) | Mobile Forensics / Optimization | Autonomous iOS triage, BMS health checks, malicious profile purging, and AdGuard DNS ad-sinkhole automation. | Claude Code, Antigravity, Cursor, Codex, Orca |
 | [`windows-sanitizer`](./plugins/windows-sanitizer/) | OS Forensics / Optimization | Autonomous Windows PC triage, telemetry deactivation, UWP bloatware removal, and OS-level network sinkhole tracking blocking. | Claude Code, Antigravity, Cursor, Codex, Orca |
 | [`linux-sanitizer`](./plugins/linux-sanitizer/) | OS Forensics / Optimization | Autonomous Linux and WSL triage (Ubuntu/Debian), disk-space recovery, telemetry deactivation, and hosts sinkhole. WSL detected automatically. | Claude Code, Antigravity, Cursor, Codex, Orca |
-| [`ft-progresso`](./plugins/ft-progresso/) | Developer Workflow | Claude Code mod: progress band above the prompt and `/progresso` pane reading Backlog.md, BMad tickets, `.devtool` and `progresso.md`, in the Fulltech design system. On OpenCode only the skill is available (no band, no pane). | Claude Code (full plugin), OpenCode (skill only) |
+| [`taskbar-progress`](./plugins/taskbar-progress/) | Developer Workflow | Claude Code mod: progress band above the prompt and `/progresso` pane reading Backlog.md, BMad tickets, `.devtool` and `progresso.md`, in the Fulltech design system. On OpenCode only the skill is available (no band, no pane). | Claude Code (full plugin), OpenCode (skill only) |
 
 ---
 
@@ -92,7 +92,7 @@ Install the desired plugin:
 /plugin install ios-sanitizer
 /plugin install linux-sanitizer
 /plugin install windows-sanitizer
-/plugin install ft-progresso@fulltech-platform-skills
+/plugin install taskbar-progress@fulltech-platform-skills
 ```
 
 ### 2. In Google Antigravity / Agentic Environments
@@ -105,23 +105,23 @@ cp -r plugins/linux-sanitizer ~/.agents/skills/
 cp -r plugins/windows-sanitizer ~/.agents/skills/
 ```
 
-### 3. In OpenCode (`ft-progresso` skill only)
-The `ft-progresso` skill is distributed for [OpenCode](https://opencode.ai/docs/skills/) at
-[`.opencode/skills/ft-progresso/`](./.opencode/skills/ft-progresso/). OpenCode discovers skills in
+### 3. In OpenCode (`taskbar-progress` skill only)
+The `taskbar-progress` skill is distributed for [OpenCode](https://opencode.ai/docs/skills/) at
+[`.opencode/skills/taskbar-progress/`](./.opencode/skills/taskbar-progress/). OpenCode discovers skills in
 `.opencode/skills/<name>/SKILL.md` (project) and `~/.config/opencode/skills/<name>/SKILL.md` (global).
 
 ```bash
 # Project level: from the root of the target project
 mkdir -p .opencode/skills
-cp -r /path/to/fulltech-platform-skills/.opencode/skills/ft-progresso .opencode/skills/
+cp -r /path/to/fulltech-platform-skills/.opencode/skills/taskbar-progress .opencode/skills/
 
 # Global level: available in every project
 mkdir -p ~/.config/opencode/skills
-cp -r /path/to/fulltech-platform-skills/.opencode/skills/ft-progresso ~/.config/opencode/skills/
+cp -r /path/to/fulltech-platform-skills/.opencode/skills/taskbar-progress ~/.config/opencode/skills/
 ```
 
 Opening OpenCode inside a clone of this repository also loads the skill, with no copy. Check that it
-was found with `opencode debug skill` (the list must include `ft-progresso`); agents load it through
+was found with `opencode debug skill` (the list must include `taskbar-progress`); agents load it through
 the native `skill` tool.
 
 What the OpenCode integration includes: the skill instructions that pick the project's board
