@@ -9,7 +9,7 @@ import type { EngineInterface, Register } from 'claude-code'
 
 import type { Origem, Sprint } from '../types'
 import { parseBacklog, parseBmad, parseDevtool, type Arquivo } from './fontes'
-import { barra, estadoReal, linhasDaFaixa, parseProgresso, placar, quemVoce } from './parse'
+import { barra, estadoReal, linhasDaFaixa, osc94, parseProgresso, placar, quemVoce, taskbar } from './parse'
 import { ANEL, anelCells, barraCells } from './raster'
 
 const PANE = 'progresso'
@@ -59,6 +59,18 @@ let bmadUltimo: Sprint | null = null
 const cache = new Map<string, { mtimeMs: number; texto: string }>()
 let feitosAntes: Record<string, number> = {}
 let animando: { cancel: () => void } | null = null
+// barra de tarefas/aba do terminal (OSC 9;4): ligada pela opção `taskbar`; só reescreve quando a sequência muda
+let taskbarLigado = true
+let taskbarUltima = ''
+
+/** Desenha (ou apaga) o progresso geral na barra de tarefas/aba do terminal, escrevendo em /dev/tty. */
+async function desenhaTaskbar($: EngineInterface, apagar = false): Promise<void> {
+  if (!taskbarLigado) return
+  const seq = apagar ? osc94({ estado: 0, pct: 0 }) : osc94(taskbar(await read($, sprints), await read($, prs), voce))
+  if (seq === taskbarUltima) return
+  taskbarUltima = seq
+  await $.process.run(['sh', '-c', 'printf "%s" "$1" > /dev/tty 2>/dev/null', 'sh', seq], { timeoutMs: 2_000 }).catch(() => undefined)
+}
 
 const chaveBarra = (pasta: string, lote: number) => `barra:${pasta}:${lote}`
 const chaveAnel = (pasta: string) => `anel:${pasta}`
@@ -160,6 +172,7 @@ async function reler($: EngineInterface): Promise<void> {
   }
   for (const s of [await lerBacklog($), await lerBmad($), await lerDevtool($)]) if (s !== null) lidos.push(s)
   await update($, sprints, () => lidos)
+  await desenhaTaskbar($)
   // item que fechou desde a última leitura: o feixe passa na barra daquele sprint
   const mapa = await read($, prs)
   const agora: Record<string, number> = {}
@@ -198,6 +211,8 @@ async function conferePRs($: EngineInterface): Promise<void> {
 export const register: Register = (on, options) => {
   const nome = typeof options.nome === 'string' ? options.nome.trim() : ''
   voce = quemVoce(nome)
+  taskbarLigado = options.taskbar !== false
+  taskbarUltima = ''
   const quem = nome || 'você'
 
   on('session.start', async ($, e, next) => {
@@ -208,6 +223,11 @@ export const register: Register = (on, options) => {
     await conferePRs($)
     $.clock.every(RELER_MS, () => { void reler($) })
     $.clock.every(GH_MS, () => { void conferePRs($) })
+    return next(e)
+  })
+
+  on('session.end', async ($, e, next) => {
+    await desenhaTaskbar($, true)
     return next(e)
   })
 

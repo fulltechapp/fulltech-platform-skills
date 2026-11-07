@@ -147,3 +147,26 @@ export function linhasDaFaixa(sprints: readonly Sprint[], prs: Readonly<Record<s
   return { linhas, resto: vivos.length - mostrados.length }
 }
 
+
+/** Estado do indicador de progresso do terminal (OSC 9;4): 0 some, 1 normal, 4 pausado (esperando você). */
+export type Taskbar = { estado: 0 | 1 | 4; pct: number }
+
+/**
+ * O progresso geral dos planos vivos (completo some): feitos/total somados. Esperando você pausa a
+ * barra (âmbar no Windows Terminal); sem plano vivo ela some.
+ */
+export function taskbar(sprints: readonly Sprint[], prs: Readonly<Record<string, string>>, voce: RegExp = VOCE): Taskbar {
+  let feitos = 0, total = 0, espera = 0
+  for (const s of sprints) {
+    const p = placar(s, prs, voce)
+    if (p.completo || p.total === 0) continue
+    feitos += p.feitos
+    total += p.total
+    espera += p.esperandoVoce
+  }
+  if (total === 0) return { estado: 0, pct: 0 }
+  return { estado: espera > 0 ? 4 : 1, pct: Math.min(100, Math.round((feitos / total) * 100)) }
+}
+
+/** A sequência OSC 9;4 (ConEmu/Windows Terminal/Ghostty/iTerm2) que desenha `t` na barra de tarefas ou na aba. */
+export const osc94 = (t: Taskbar): string => `\x1b]9;4;${t.estado};${t.pct}\x07`

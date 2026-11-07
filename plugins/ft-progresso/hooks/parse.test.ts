@@ -1,6 +1,6 @@
 import { expect, test } from 'claude-code/testing'
 
-import { barra, estadoReal, linhasDaFaixa, parseProgresso, placar, quemVoce } from './parse'
+import { barra, estadoReal, linhasDaFaixa, osc94, parseProgresso, placar, quemVoce, taskbar } from './parse'
 
 const MD = [
   '# Progresso: Loja nova',
@@ -81,4 +81,19 @@ test('barra: proporcional, sempre na largura pedida', () => {
   expect(barra(7, 10, 10)).toEqual({ cheio: '███████', vazio: '░░░' })
   expect(barra(0, 0, 4)).toEqual({ cheio: '', vazio: '░░░░' })
   expect(barra(3, 3, 5).cheio.length + barra(3, 3, 5).vazio.length).toBe(5)
+})
+
+test('taskbar: % geral dos planos vivos, pausa se espera você, some sem plano vivo', () => {
+  const a = parseProgresso('a', '## L\n- [x] um\n- [ ] dois\n- [ ] tres\n- [ ] quatro', 1)
+  const pronto = parseProgresso('b', '## L\n- [x] um', 1)
+  expect(taskbar([a, pronto], {})).toEqual({ estado: 1, pct: 25 })
+  const espera = parseProgresso('c', '## L\n- [x] um\n- [!] aprovar  quem: você', 1)
+  expect(taskbar([espera], {})).toEqual({ estado: 4, pct: 50 })
+  expect(taskbar([pronto], {})).toEqual({ estado: 0, pct: 0 })
+  expect(taskbar([], {})).toEqual({ estado: 0, pct: 0 })
+})
+
+test('osc94 monta a sequência do terminal', () => {
+  expect(osc94({ estado: 1, pct: 42 })).toBe('\u001b]9;4;1;42\u0007')
+  expect(osc94({ estado: 0, pct: 0 })).toBe('\u001b]9;4;0;0\u0007')
 })

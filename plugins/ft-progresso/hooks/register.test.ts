@@ -6,7 +6,7 @@ const RAIZ = '/home/ana/loja'
 const P = RAIZ.replace(/\\/g, '/')
 
 /** Um projeto em memória: caminho do arquivo -> texto. */
-function projeto(on: On, arquivos: Readonly<Record<string, string>>, recusaComando = false): void {
+function projeto(on: On, arquivos: Readonly<Record<string, string>>, recusaComando = false, tty: string[] = []): void {
   const n = (c: string): string => c.replace(/\\/g, '/')
   const abs: Record<string, string> = Object.fromEntries(Object.entries(arquivos).map(([k, v]) => [`${P}/${k}`, v]))
   on('session.root', () => ({ value: RAIZ }))
@@ -32,6 +32,7 @@ function projeto(on: On, arquivos: Readonly<Record<string, string>>, recusaComan
     return { value: [...nomes].map(([name, kind]) => ({ name, kind, size: 0, mtimeMs: 1, isLink: false })) }
   })
   on('process.run', (_$, e) => {
+    if (e.argv[0] === 'sh') { tty.push(e.argv[4] ?? ''); return { value: { exitCode: 0, stdout: '', stderr: '', isStdoutTruncated: false, isStderrTruncated: false } } }
     const bmad = e.argv[0] === 'python3' ? arquivos['@tickets'] : undefined
     return { value: { exitCode: bmad === undefined ? 1 : 0, stdout: bmad ?? '', stderr: bmad === undefined ? 'not found' : '', isStdoutTruncated: false, isStderrTruncated: false } }
   })
@@ -111,4 +112,20 @@ test('Backlog.md, BMad e .devtool juntos: um plano cada, e a regra de cada board
   expect(t).toContain('tickets.py mark')
   expect(t).toContain('card.sh')
   expect(t).not.toContain('progresso.md` (raiz')
+})
+
+test('taskbar: escreve o OSC 9;4 em /dev/tty só quando o % muda', async ($, on) => {
+  const vistas: string[] = []
+  projeto(on, { 'progresso.md': '# Progresso: Raiz\n## A\n- [x] um\n- [ ] dois' }, false, vistas)
+  await abrir($)
+  await $.command.run(RUN)
+  expect(vistas).toEqual(['\u001b]9;4;1;50\u0007'])
+})
+
+test('taskbar desligado na opção: não escreve nada', { options: { taskbar: false } }, async ($, on) => {
+  const vistas: string[] = []
+  projeto(on, { 'progresso.md': '# Progresso: Raiz\n## A\n- [x] um\n- [ ] dois' }, false, vistas)
+  await abrir($)
+  await $.command.run(RUN)
+  expect(vistas).toEqual([])
 })

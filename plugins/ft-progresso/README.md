@@ -14,6 +14,10 @@ próximo item, e abre um painel com tudo em `/progresso`. Lê os quatro boards e
   total e o próximo item. O plano com item em andamento vem primeiro, marcado com `▸`.
 - **Painel `/progresso`:** um cartão por plano com o anel de %, a origem (`[backlog]`, `[bmad]`,
   `[devtool]`, `[md]`), a barra de cada lote e os itens dos lotes abertos.
+- **Barra de tarefas / aba do terminal:** o % geral dos planos vivos aparece na barra de tarefas ou na
+  aba (OSC 9;4: Windows Terminal, Ghostty, iTerm2, ConEmu), em âmbar quando algo espera você; some
+  quando não há plano vivo ou a sessão termina. Desligue em `/config` (`taskbar`). Dentro do tmux a
+  sequência não passa.
 - **Esperando você** em âmbar: item bloqueado com você no `quem:` / assignee.
 - **Confere com o GitHub:** item de `progresso.md` com `pr:N` é conferido pelo `gh`.
 - **Regra no prompt:** só para os boards que o repo tem, dizendo como atualizar cada um (CLI
@@ -71,6 +75,9 @@ Mod roda com o teu acesso. Este aqui:
   (só em repo com `_bmad/`, no máximo a cada 30 s) e `gh pr list` (só se algum `progresso.md` tiver
   `pr:N`, a cada 5 min). Sem `python3` ou sem `gh`, aquela fonte para e o resto segue;
 - **escreve no contexto do Claude** a regra de manter os boards verdadeiros, só nos repos que têm board;
+- **escreve** uma única sequência de controle (OSC 9;4, o % da barra de tarefas) em `/dev/tty` via
+  `sh -c printf`, só quando o % muda e se a opção `taskbar` estiver ligada (padrão); falha em silêncio
+  sem tty;
 - **não** acessa a internet, **não** escreve em disco e **não** guarda nada fora da sessão.
 
 ## Desenvolvimento
