@@ -153,3 +153,68 @@ export function parseDevtool(cards: readonly Arquivo[]): Sprint {
   pares.sort((a, b) => a.ord.localeCompare(b.ord))
   return { origem: 'devtool', pasta: '.devtool', titulo: '.devtool (legado)', lotes: agrupa(pares), mtimeMs }
 }
+
+// ── superpowers (docs/superpowers/plans/*.md) ───────────────────────────────────────────────────
+
+const PASSO = /^\s*[-*]\s+\[([ xX])\]\s+(.*)$/
+const semNegrito = (s: string): string => s.replace(/\*\*/g, '').replace(/\s{2,}/g, ' ').trim()
+
+/**
+ * Um plano do superpowers:writing-plans vira um Sprint: lote = `### Task N: nome`, item = passo
+ * `- [ ] **Step n: ...**`. Num task começado, o 1º passo aberto conta como andando.
+ */
+export function parseSuperpowers(plano: Arquivo): Sprint | null {
+  let titulo = plano.nome.replace(/\.md$/, '').replace(/^\d{4}-\d{2}-\d{2}-/, '')
+  const lotes: Lote[] = []
+  for (const linha of plano.texto.split(/\r?\n/)) {
+    const h1 = /^#\s+(.+?)(?:\s+Implementation Plan)?\s*$/.exec(linha)
+    if (h1 && h1[1] && lotes.length === 0) { titulo = h1[1].trim(); continue }
+    const task = /^#{2,3}\s+(Task\s+\S+?:?\s*.*)$/i.exec(linha)
+    if (task && task[1]) { lotes.push({ nome: semNegrito(task[1]), itens: [] }); continue }
+    const m = PASSO.exec(linha)
+    if (!m || lotes.length === 0) continue
+    lotes[lotes.length - 1]?.itens.push(item(semNegrito(m[2] ?? ''), (m[1] ?? ' ') === ' ' ? 'falta' : 'feito', null))
+  }
+  const comItens = lotes.filter((l) => l.itens.length > 0)
+  if (comItens.length === 0) return null
+  for (const l of comItens) {
+    const algum = l.itens.some((i) => i.estado === 'feito')
+    const aberto = l.itens.find((i) => i.estado === 'falta')
+    if (algum && aberto) aberto.estado = 'andando'
+  }
+  return { origem: 'superpowers', pasta: `superpowers:${plano.nome.replace(/\.md$/, '')}`, titulo, lotes: comItens, mtimeMs: plano.mtimeMs }
+}
+
+// ── EGM (Elephant Goldfish Model): relatórios de revisão ────────────────────────────────────────
+
+const PRIORIDADE: Array<[string, string]> = [['🔴', 'Blocker'], ['🟡', 'Major'], ['🟢', 'Nit']]
+
+/**
+ * `consolidated_review_report.md` / `goldfish_review_report.md` do egm-review e egm-resolve: lote =
+ * prioridade (🔴 Blocker, 🟡 Major, 🟢 Nit), item = achado (linha de lista ou título que abre com o
+ * emoji). `Status: resolved` no topo (o egm-resolve que escreve) fecha tudo; fora isso, `[x]`, ✅ ou
+ * ~~riscado~~ fecham o achado. Melhor esforço: o formato fino do relatório é do EGM.
+ */
+export function parseEgm(relatorios: readonly Arquivo[]): Sprint | null {
+  const lotes = new Map<string, Item[]>()
+  let mtimeMs = 0
+  for (const rel of relatorios) {
+    mtimeMs = Math.max(mtimeMs, rel.mtimeMs)
+    const resolvido = /^\s*(?:\*\*)?Status:?(?:\*\*)?:?\s*resolved\b/im.test(rel.texto)
+    for (const linha of rel.texto.split(/\r?\n/)) {
+      const m = /^\s*(?:[-*]\s+(?:\[([ xX])\]\s+)?|#{2,4}\s+)(?:\*\*)?\s*([🔴🟡🟢])\s*(.*)$/u.exec(linha)
+      if (!m) continue
+      const prio = PRIORIDADE.find(([e]) => e === m[2])
+      const texto = semNegrito((m[3] ?? '').replace(/^[:\-–—]\s*/, ''))
+      if (!prio || texto === '') continue
+      const feito = resolvido || (m[1] ?? '').toLowerCase() === 'x' || /✅|^~~.*~~$/.test(texto)
+      const nome = `${prio[0]} ${prio[1]}`
+      const l = lotes.get(nome) ?? []
+      l.push(item(texto.replace(/✅/g, '').replace(/^~~|~~$/g, '').trim(), feito ? 'feito' : 'falta', null))
+      lotes.set(nome, l)
+    }
+  }
+  if (lotes.size === 0) return null
+  const ordenados = PRIORIDADE.map(([e, n]) => `${e} ${n}`).filter((n) => lotes.has(n)).map((nome) => ({ nome, itens: lotes.get(nome) ?? [] }))
+  return { origem: 'egm', pasta: 'egm:revisao', titulo: 'EGM: achados da revisão', lotes: ordenados, mtimeMs }
+}

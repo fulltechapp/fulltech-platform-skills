@@ -1,6 +1,6 @@
 import { expect, test } from 'claude-code/testing'
 
-import { estadoBacklog, estadoDevtool, frontmatter, parseBacklog, parseBmad, parseDevtool } from './fontes'
+import { estadoBacklog, estadoDevtool, frontmatter, parseBacklog, parseBmad, parseDevtool, parseEgm, parseSuperpowers } from './fontes'
 import { placar, rotulo } from './parse'
 
 const arq = (nome: string, texto: string, mtimeMs = 1) => ({ nome, texto, mtimeMs })
@@ -79,4 +79,33 @@ test('.devtool: colunas no mapa comum, título sem o id, quem do label, ordem do
 test('rótulo curto do lote', () => {
   expect(['L0 Base', 'Wave VI · CRUD', 'Wave 2a', 'Épico 01a · x', 'Wave EN', 'Histórico (pré)', 'W1 ft-progresso'].map(rotulo))
     .toEqual(['L0', 'Wave VI', 'Wave 2a', 'Épico 01a', 'Wave EN', 'Histórico', 'W1'])
+})
+
+
+
+test('superpowers: task vira lote, passo vira item, 1º aberto de task começado anda', () => {
+  const s = parseSuperpowers(arq('2026-11-07-login.md', [
+    '# Login Implementation Plan', '',
+    '### Task 1: Form', '- [x] **Step 1: Write the failing test**', '- [ ] **Step 2: Implement**',
+    '### Task 2: API', '- [ ] **Step 1: Write test**',
+  ].join('\n')))
+  expect(s?.origem).toBe('superpowers')
+  expect(s?.titulo).toBe('Login')
+  expect(s?.lotes.map((l) => l.nome)).toEqual(['Task 1: Form', 'Task 2: API'])
+  expect(s?.lotes[0]?.itens.map((i) => i.estado)).toEqual(['feito', 'andando'])
+  expect(s?.lotes[1]?.itens[0]?.estado).toBe('falta')
+})
+
+test('superpowers: plano sem checkbox não vira sprint', () => {
+  expect(parseSuperpowers(arq('x.md', '# Nada\n### Task 1: x\ntexto'))).toBeNull()
+})
+
+test('egm: achados por prioridade; Status: resolved fecha tudo', () => {
+  const rel = ['# Review', '- 🔴 Falta rollback', '- 🟡 Nome ambíguo', '### 🟢 Nit de estilo'].join('\n')
+  const aberto = parseEgm([arq('consolidated_review_report.md', rel)])
+  expect(aberto?.lotes.map((l) => l.nome)).toEqual(['🔴 Blocker', '🟡 Major', '🟢 Nit'])
+  expect(aberto?.lotes.flatMap((l) => l.itens).every((i) => i.estado === 'falta')).toBe(true)
+  const fechado = parseEgm([arq('goldfish_review_report.md', `Status: resolved\n${rel}`)])
+  expect(fechado?.lotes.flatMap((l) => l.itens).every((i) => i.estado === 'feito')).toBe(true)
+  expect(parseEgm([arq('consolidated_review_report.md', '# vazio')])).toBeNull()
 })

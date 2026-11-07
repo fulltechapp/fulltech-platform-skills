@@ -1,8 +1,8 @@
 /** Estado comum das quatro fontes: `[ ]` falta, `[~]` andando, `[!]` esperando, `[x]` feito. */
 export type Estado = 'falta' | 'andando' | 'esperando' | 'feito'
 
-/** De onde veio o plano: progresso.md, Backlog.md, tickets do BMad ou o board legado .devtool. */
-export type Origem = 'progresso' | 'backlog' | 'bmad' | 'devtool'
+/** De onde veio o plano: progresso.md, Backlog.md, tickets do BMad, o board legado .devtool, planos do superpowers ou relatórios do EGM. */
+export type Origem = 'progresso' | 'backlog' | 'bmad' | 'devtool' | 'superpowers' | 'egm'
 
 export type Item = {
   texto: string

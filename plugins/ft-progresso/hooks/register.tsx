@@ -8,7 +8,7 @@ import { atom, read, update } from 'claude-code'
 import type { EngineInterface, Register } from 'claude-code'
 
 import type { Origem, Sprint } from '../types'
-import { parseBacklog, parseBmad, parseDevtool, type Arquivo } from './fontes'
+import { parseBacklog, parseBmad, parseDevtool, parseEgm, parseSuperpowers, type Arquivo } from './fontes'
 import { barra, estadoReal, linhasDaFaixa, osc94, parseProgresso, placar, quemVoce, taskbar } from './parse'
 import { ANEL, anelCells, barraCells } from './raster'
 
@@ -32,11 +32,13 @@ const REGRAS: Record<Origem, (voce: string) => string> = {
   backlog: () => 'Backlog.md (`backlog/`): mude o status só pela CLI (`backlog task edit <id> -s "In Progress"` ao começar, `-s Done` ao terminar, `--check-ac <n>` por critério cumprido), nunca editando os `.md` de `backlog/` à mão.',
   bmad: () => `Tickets BMad da iniciativa ativa: status por \`python3 ${TICKETS} mark <ref> <in-progress|in-review|done>\` (travado: \`--blocked "<motivo>"\`).`,
   devtool: () => 'Board legado `.devtool/`: mova o card com `.devtool/card.sh <id> <status>` se existir; ao trabalhar neste repo, proponha migrar os cards para o Backlog.md.',
+  superpowers: () => 'Planos do superpowers (`docs/superpowers/plans/`): marque `- [x]` no passo assim que ele passar no teste; não renumere tasks.',
+  egm: () => 'Relatórios do EGM (`consolidated_review_report.md`, `goldfish_review_report.md`): ao resolver um achado, marque `- [x]`; ao terminar o `egm-resolve`, `Status: resolved` no topo.',
   progresso: (voce) => `\`progresso.md\` (raiz, \`plans/<plano>/\`): começou -> \`[~]\`; esperando alguém -> \`[!]\` com \`quem: <${voce} | pessoa | data>\` no fim; terminou -> \`[x]\` com a evidência na linha (\`pr:N\`, hash, data).`,
 }
 const regra = (origens: ReadonlySet<Origem>, voce: string): string => [
   'O usuário acompanha os planos deste projeto numa faixa acima do prompt e no /progresso. Mantenha cada board verdadeiro no mesmo passo em que o estado muda:',
-  ...(['backlog', 'bmad', 'devtool', 'progresso'] as const).filter((o) => origens.has(o)).map((o) => `- ${REGRAS[o](voce)}`),
+  ...(['backlog', 'bmad', 'devtool', 'superpowers', 'egm', 'progresso'] as const).filter((o) => origens.has(o)).map((o) => `- ${REGRAS[o](voce)}`),
   'Só marque feito com teste ou prova desta sessão. Item novo entra no lote certo. Não crie `progresso.md` em projeto que já tem Backlog.md ou BMad.',
 ].join('\n')
 
@@ -45,7 +47,7 @@ const C = {
   fundo: '#090A0F', card: '#11131A', borda: '#1E2230', bordaForte: '#2D3348', ink: '#F8FAFC', body: '#CBD5E1', muted: '#94A3B8',
   apagado: '#475569', acento: '#10B981', claro: '#38BDF8', ambar: '#F59E0B', erro: '#F43F5E', trilho: '#1E2230',
 }
-const SELO: Record<Origem, string> = { progresso: 'md', backlog: 'backlog', bmad: 'bmad', devtool: 'devtool' }
+const SELO: Record<Origem, string> = { progresso: 'md', backlog: 'backlog', bmad: 'bmad', devtool: 'devtool', superpowers: 'superpowers', egm: 'egm' }
 const ICONE: Record<string, string> = { feito: '✓', andando: '◐', esperando: '⏳', falta: '○', diverge: '✗' }
 
 // estado do módulo: recomeça a cada carga, o que importa fica em $.state
@@ -155,6 +157,23 @@ async function lerDevtool($: EngineInterface): Promise<Sprint | null> {
   return cards.length > 0 ? parseDevtool(cards) : null
 }
 
+/** superpowers: um Sprint por plano de `docs/superpowers/plans/`. */
+async function lerSuperpowers($: EngineInterface): Promise<Sprint[]> {
+  const planos = await mds($, `${raiz}/docs/superpowers/plans`)
+  return planos.map(parseSuperpowers).filter((s): s is Sprint => s !== null)
+}
+
+const EGM_RELATORIOS = ['consolidated_review_report.md', 'goldfish_review_report.md']
+
+/** EGM: os relatórios de revisão na raiz ou em `docs/designs/`, juntos num Sprint. */
+async function lerEgm($: EngineInterface): Promise<Sprint | null> {
+  const achados: Arquivo[] = []
+  for (const dir of [raiz, `${raiz}/docs/designs`]) {
+    for (const a of await mds($, dir)) if (EGM_RELATORIOS.includes(a.nome)) achados.push(a)
+  }
+  return parseEgm(achados)
+}
+
 async function reler($: EngineInterface): Promise<void> {
   if (raiz === '') return
   const achados = [{ nome: raiz.split(/[\\/]/).filter(Boolean).pop() ?? 'projeto', arq: `${raiz}/progresso.md` }]
@@ -170,7 +189,7 @@ async function reler($: EngineInterface): Promise<void> {
     const texto = await $.fs.read(arq).catch(() => '')
     lidos.push(parseProgresso(nome, texto, st.mtimeMs))
   }
-  for (const s of [await lerBacklog($), await lerBmad($), await lerDevtool($)]) if (s !== null) lidos.push(s)
+  for (const s of [await lerBacklog($), await lerBmad($), await lerDevtool($), ...(await lerSuperpowers($)), await lerEgm($)]) if (s !== null) lidos.push(s)
   await update($, sprints, () => lidos)
   await desenhaTaskbar($)
   // item que fechou desde a última leitura: o feixe passa na barra daquele sprint
@@ -235,7 +254,7 @@ export const register: Register = (on, options) => {
     await reler($)
     await conferePRs($)
     const lista = await read($, sprints)
-    if (lista.length === 0) return { text: 'Nenhum plano neste projeto (Backlog.md, BMad, .devtool ou progresso.md). Peça pro Claude montar o plano e a faixa aparece.' }
+    if (lista.length === 0) return { text: 'Nenhum plano neste projeto (Backlog.md, BMad, .devtool, superpowers, EGM ou progresso.md). Peça pro Claude montar o plano e a faixa aparece.' }
     await $.ui.open({ id: PANE, title: 'Progresso' })
     const mapa = await read($, prs)
     // o painel monta no próximo quadro: o feixe começa logo depois

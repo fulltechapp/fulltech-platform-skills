@@ -8,6 +8,8 @@ próximo item, e abre um painel com tudo em `/progresso`. Lê os quatro boards e
 | **Backlog.md** | `backlog/config.yml`, `backlog/tasks`, `backlog/completed`, `backlog/milestones` | milestone (wave) | task |
 | **BMad** | `_bmad/method/scripts/tickets.py status` (iniciativa ativa) | epic | ticket |
 | **.devtool** (legado) | `.devtool/features` e `features/done` | `epic` | card |
+| **superpowers** | `docs/superpowers/plans/*.md` (um plano = um card) | `### Task N` | passo `- [ ]` (o 1º aberto de task começado conta como andando) |
+| **EGM** (Elephant Goldfish Model) | `consolidated_review_report.md` e `goldfish_review_report.md`, na raiz ou em `docs/designs/` | prioridade 🔴 Blocker / 🟡 Major / 🟢 Nit | achado (`Status: resolved` no topo, `[x]` ou ✅ fecham). Melhor esforço |
 | **progresso.md** | raiz, `plans/<plano>/`, `.aios/plans/sprints/<plano>/` | `##` | `- [ ]` |
 
 - **Faixa acima do prompt:** uma linha por plano vivo (até 3), com a barra do lote em curso, o
